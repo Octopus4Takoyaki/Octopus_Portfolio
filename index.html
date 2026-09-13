@@ -401,6 +401,172 @@
       }
 
       /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  69 · GRAIN — 极轻纸纹，压低数字感（不改配色）                        ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        pointer-events: none;
+        opacity: 0.05;
+        mix-blend-mode: soft-light;
+        background-size: 140px 140px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  43 · 阅读进度条                                                     ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--c-accent);
+        z-index: 300;
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  41 + 49 · 滚动出现（淡入上移 16px）与错峰                          ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      .reveal {
+        opacity: 0;
+      }
+      .reveal.is-in {
+        opacity: 1;
+        animation: reveal-up 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+        animation-delay: var(--rd, 0ms);
+      }
+      @keyframes reveal-up {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  48 · 悬停微交互（卡片上移 + 边框转强调色 + 短线变长）               ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      .card {
+        transition: transform 0.22s ease-out, border-color 0.22s ease-out,
+          background-color 0.22s ease-out;
+      }
+      .card .rule {
+        transition: width 0.22s ease-out, background-color 0.22s ease-out;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(192, 112, 48, 0.55);
+        background: var(--c-bg-card-2);
+      }
+      .card:hover .rule {
+        width: 54px;
+      }
+      .thesis-right .card.reveal.is-in:hover {
+        transform: translateY(-4px);
+      }
+      .tag {
+        transition: color 0.22s ease-out, border-color 0.22s ease-out;
+      }
+      .tag:hover {
+        color: var(--c-accent);
+        border-color: rgba(192, 112, 48, 0.5);
+      }
+      .nav-dot:hover {
+        background: rgba(240, 232, 210, 0.7);
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--c-accent);
+        outline-offset: 3px;
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  72 · 磁吸按钮（仅主 CTA，最大偏移 6px）                             ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      .btn--primary {
+        transition: transform 0.2s ease-out, background 0.25s ease,
+          border-color 0.25s ease, color 0.25s ease;
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  COVER · 滚动提示                                                    ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      .scroll-cue {
+        position: absolute;
+        left: 7vw;
+        bottom: 4.5vh;
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        font-family: var(--f-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--c-fg-3);
+      }
+      .scroll-cue i {
+        display: block;
+        width: 46px;
+        height: 1px;
+        position: relative;
+        overflow: hidden;
+        background: rgba(240, 232, 210, 0.16);
+      }
+      .scroll-cue i::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 16px;
+        height: 1px;
+        background: var(--c-accent);
+        animation: cue-slide 2.6s ease-in-out infinite;
+      }
+      @keyframes cue-slide {
+        0% {
+          transform: translateX(-18px);
+        }
+        65%,
+        100% {
+          transform: translateX(48px);
+        }
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  79 · 减少动态效果                                                   ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .reveal {
+          opacity: 1;
+        }
+        .reveal.is-in {
+          animation: none;
+        }
+        .card,
+        .card .rule,
+        .btn--primary,
+        .tag {
+          transition: none;
+        }
+        .card:hover .rule {
+          width: 30px;
+        }
+        .scroll-cue i::after {
+          animation: none;
+        }
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
          ║  RESPONSIVE                                                        ║
          ╚══════════════════════════════════════════════════════════════════════╝ */
       @media (max-width: 900px) {
@@ -434,7 +600,9 @@
         <span class="tag">方法论封装</span>
         <span class="tag">Skill 设计</span>
         <span class="tag">生态策略</span>
+        <span class="tag">企业级交付</span>
       </div>
+      <div class="scroll-cue"><span>向下滚动 · Scroll</span><i></i></div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -643,12 +811,13 @@
         </div>
       </div>
       <div class="btn-group">
-        <a href="https://octopus4takoyaki.github.io/Octopus_Portfolio/beyond-jd/product-overview.html" class="btn btn--primary" target="_blank">查看产品介绍</a>
+        <a href="https://microsoftedge.microsoft.com/addons/detail/gpokicaodeiplgolakeibajppfjampem" class="btn btn--primary" target="_blank">前往 Edge 商店安装</a>
+        <a href="https://octopus4takoyaki.github.io/Octopus_Portfolio/beyond-jd/product-overview.html" class="btn" target="_blank">查看产品介绍</a>
         <a href="https://octopus4takoyaki.github.io/beyond-jd-privacy-policy/" class="btn" target="_blank">查看隐私政策</a>
       </div>
       <footer class="section-foot">
         <span class="label">章鱼（Octopus Way）· Portfolio</span>
-        <span class="label">浏览器扩展 · Edge 商店审核中</span>
+        <span class="label">浏览器扩展 · 已上线 Edge 商店</span>
       </footer>
     </section>
 
@@ -779,15 +948,20 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!--  NAVIGATION DOTS                                                      -->
+    <!--  NAVIGATION DOTS + 阅读进度条                                          -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <nav id="nav-dots" aria-label="Section navigation"></nav>
+    <div id="progress" aria-hidden="true"></div>
 
     <script>
       (function () {
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
         const sections = Array.from(document.querySelectorAll(".section"));
         const dotsNav = document.getElementById("nav-dots");
 
+        /* ── 导航圆点 ─────────────────────────────────────────────────── */
         sections.forEach(function (_, i) {
           const dot = document.createElement("button");
           dot.className = "nav-dot";
@@ -818,6 +992,92 @@
 
         const firstDot = dotsNav.querySelector(".nav-dot");
         if (firstDot) firstDot.classList.add("is-active");
+
+        /* ── 41 + 49 · 滚动出现与错峰（只播一次） ─────────────────────── */
+        /* 成组元素：整组进入视口后，子项按 70ms 间隔依次出现 */
+        const groups = document.querySelectorAll(
+          ".card-row, .thesis-right, .btn-group, .tag-cloud"
+        );
+        /* 单元元素：自身进入视口即出现 */
+        const singles = document.querySelectorAll(
+          ".section-chrome, .project-head, .thesis-left, .cover-name, .cover-title, .cover-subtitle, .scroll-cue, .end-invite, .end-contact"
+        );
+
+        if (!reduceMotion && "IntersectionObserver" in window) {
+          const revealObserver = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                if (el.hasAttribute("data-stagger")) {
+                  Array.from(el.children).forEach(function (child, i) {
+                    child.style.setProperty(
+                      "--rd",
+                      Math.min(i * 70, 280) + "ms"
+                    );
+                    child.classList.add("reveal", "is-in");
+                  });
+                } else {
+                  el.classList.add("reveal", "is-in");
+                }
+                revealObserver.unobserve(el);
+              });
+            },
+            { threshold: 0.2, rootMargin: "0px 0px -6% 0px" }
+          );
+
+          groups.forEach(function (g) {
+            g.setAttribute("data-stagger", "");
+            revealObserver.observe(g);
+          });
+          singles.forEach(function (s) {
+            revealObserver.observe(s);
+          });
+        }
+
+        /* ── 43 · 阅读进度条 ─────────────────────────────────────────── */
+        const bar = document.getElementById("progress");
+        let ticking = false;
+        function updateProgress() {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+          bar.style.width = pct.toFixed(2) + "%";
+          ticking = false;
+        }
+        window.addEventListener(
+          "scroll",
+          function () {
+            if (!ticking) {
+              ticking = true;
+              window.requestAnimationFrame(updateProgress);
+            }
+          },
+          { passive: true }
+        );
+        updateProgress();
+
+        /* ── 72 · 磁吸按钮（仅主 CTA，偏移 ≤ 6px） ────────────────────── */
+        const finePointer = window.matchMedia(
+          "(hover: hover) and (pointer: fine)"
+        ).matches;
+        if (finePointer && !reduceMotion) {
+          document.querySelectorAll(".btn--primary").forEach(function (btn) {
+            btn.addEventListener("mousemove", function (e) {
+              const r = btn.getBoundingClientRect();
+              const dx = (e.clientX - r.left - r.width / 2) / r.width;
+              const dy = (e.clientY - r.top - r.height / 2) / r.height;
+              btn.style.transform =
+                "translate(" +
+                (dx * 12).toFixed(1) +
+                "px," +
+                (dy * 8).toFixed(1) +
+                "px)";
+            });
+            btn.addEventListener("mouseleave", function () {
+              btn.style.transform = "";
+            });
+          });
+        }
       })();
     </script>
   </body>

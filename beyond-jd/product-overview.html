@@ -55,7 +55,8 @@
       .hero { display: grid; grid-template-columns: minmax(0, .95fr) minmax(350px, 1.05fr); gap: clamp(2.5rem, 7vw, 9rem); align-items: center; }
       .brand { font-family: var(--f-display); font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: .7rem; margin-bottom: 1.6rem; }
       .brand::before { content: ""; width: 28px; height: 1px; background: var(--teal); }
-      .status { color: var(--amber); border: 1px solid rgba(231,179,96,.42); padding: .45rem .65rem; width: fit-content; margin-top: 1.5rem; }
+      .status { color: var(--green); border: 1px solid rgba(130,211,145,.5); padding: .45rem .65rem; width: fit-content; margin-top: 1.5rem; text-decoration: none; }
+      .status:hover { border-color: var(--teal); color: var(--teal); }
       .browser { background: rgba(233, 242, 237, 0.08); border: 1px solid rgba(233,242,237,.24); border-radius: var(--radius); padding: .7rem; box-shadow: 0 28px 64px rgba(0,0,0,.34); backdrop-filter: blur(18px); }
       .browser-top { display: flex; gap: .38rem; padding: 0 .1rem .7rem; }
       .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(238,248,242,.4); }
@@ -99,7 +100,7 @@
           <h1>从一段 JD 看见<br />岗位背后的工作情境</h1>
           <p class="lead">Beyond JD 是一个基于 Chromium Manifest V3 的浏览器扩展。用户在招聘页选中岗位描述后，可在当前页面中获得分层解读、复制结论或导出 Markdown。</p>
           <div class="tags"><span class="tag">Chrome / Edge</span><span class="tag">BYOK</span><span class="tag">无自建服务端</span></div>
-          <div class="status">Edge Add-ons · 审核中</div>
+          <a class="status" href="https://microsoftedge.microsoft.com/addons/detail/gpokicaodeiplgolakeibajppfjampem" target="_blank" rel="noreferrer">Edge Add-ons · 已上架 ↗</a>
         </div>
         <div class="browser" aria-label="Beyond JD 界面结构示意">
           <div class="browser-top"><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
@@ -142,12 +143,12 @@
     <section class="section">
       <header class="chrome"><span class="mono">Privacy & Scope</span><span class="mono">05</span></header>
       <div class="privacy"><p class="kicker">BYOK 配置</p><h2>密钥由用户管理<br />产品不设自建业务服务器</h2><p>用户自行配置模型 API Key，密钥仅保存在浏览器本地存储。产品只将用户主动选中的 JD 文本和公司、行业提示发送至其选择的模型服务商；不收集浏览历史，不爬取招聘平台或面经数据。</p><div class="button-row"><a class="btn" href="https://octopus4takoyaki.github.io/beyond-jd-privacy-policy/" target="_blank" rel="noreferrer">查看隐私政策</a></div></div>
-      <div class="boundary"><article><h3>当前支持</h3><p>Chrome 与 Edge 共用同一套 Manifest V3 代码；产品目前以本地加载和 Edge 商店审核为主要发布状态。</p></article><article><h3>当前边界</h3><p>公司与行业识别为启发式判断，可由用户手动修正；grounding 主要依赖模型已有知识，实时联网检索与飞书推送尚未实现。</p></article><article><h3>使用提示</h3><p>生成内容基于公开信息与行业通识，不代表公司内部视角。用户应在面试或后续沟通中自行核实关键结论。</p></article><article><h3>暂未适配</h3><p>Firefox 与 Safari 尚未适配，历史记录与外部协作同步不在当前 MVP 范围内。</p></article></div>
+      <div class="boundary"><article><h3>当前支持</h3><p>Chrome 与 Edge 共用同一套 Manifest V3 代码；产品已正式发布至 Microsoft Edge 商店，并支持本地加载。</p></article><article><h3>当前边界</h3><p>公司与行业识别为启发式判断，可由用户手动修正；grounding 主要依赖模型已有知识，实时联网检索与飞书推送尚未实现。</p></article><article><h3>使用提示</h3><p>生成内容基于公开信息与行业通识，不代表公司内部视角。用户应在面试或后续沟通中自行核实关键结论。</p></article><article><h3>暂未适配</h3><p>Firefox 与 Safari 尚未适配，历史记录与外部协作同步不在当前 MVP 范围内。</p></article></div>
       <footer class="foot"><span class="mono">Beyond JD</span><span class="mono">Privacy · Scope · Transparency</span></footer>
     </section>
 
     <section class="section end">
-      <div class="brand">章鱼（Octopus Way）</div><p class="kicker">Beyond JD</p><h2>让求职者不只看见 JD<br />也看见它对应的工作现实</h2><p class="lead">浏览器扩展已完成发布包与隐私材料准备，Edge Add-ons 当前处于审核中。商店页面正式上线后，将在此补充安装入口。</p><div class="button-row"><a class="btn primary" href="https://octopus4takoyaki.github.io/beyond-jd-privacy-policy/" target="_blank" rel="noreferrer">查看隐私政策</a></div><footer class="foot" style="width:100%"><span class="mono">章鱼（Octopus Way）· Beyond JD</span><span class="mono">Browser Extension · Edge Review Pending</span></footer>
+      <div class="brand">章鱼（Octopus Way）</div><p class="kicker">Beyond JD</p><h2>让求职者不只看见 JD<br />也看见它对应的工作现实</h2><p class="lead">浏览器扩展已正式发布至 Microsoft Edge 商店。在任意招聘页面选中 JD，即可在当前页面获得分层解读；密钥由你自行配置（BYOK），数据不出浏览器。</p><div class="button-row"><a class="btn primary" href="https://microsoftedge.microsoft.com/addons/detail/gpokicaodeiplgolakeibajppfjampem" target="_blank" rel="noreferrer">前往 Edge 商店安装</a><a class="btn" href="https://octopus4takoyaki.github.io/beyond-jd-privacy-policy/" target="_blank" rel="noreferrer">查看隐私政策</a></div><footer class="foot" style="width:100%"><span class="mono">章鱼（Octopus Way）· Beyond JD</span><span class="mono">Browser Extension · Published on Edge Add-ons</span></footer>
     </section>
   </body>
 </html>
