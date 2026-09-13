@@ -37,10 +37,14 @@
         --c-border-light: rgba(30, 40, 32, 0.14);
         --c-wood: #7a4e24;
 
-        --f-display: "Bricolage Grotesque", "Noto Serif SC", serif;
-        --f-heading: "Noto Serif SC", "Bricolage Grotesque", serif;
-        --f-body: "Noto Sans SC", "DM Sans", system-ui, sans-serif;
-        --f-mono: "DM Mono", monospace;
+        --f-display: "Bricolage Grotesque", "Noto Serif SC", "Songti SC",
+          "SimSun", serif;
+        --f-heading: "Noto Serif SC", "Source Han Serif SC", "Songti SC",
+          "SimSun", "Bricolage Grotesque", serif;
+        --f-body: "Noto Sans SC", "DM Sans", "PingFang SC", "Microsoft YaHei",
+          "Hiragino Sans GB", system-ui, sans-serif;
+        --f-mono: "DM Mono", "SFMono-Regular", Consolas, "Microsoft YaHei",
+          monospace;
       }
 
       *,
@@ -704,11 +708,29 @@
       }
 
       @media (max-width: 1100px) {
+        #topnav {
+          gap: 1rem;
+          padding: 0.8rem 5vw;
+        }
+        /* 手机端不再隐藏导航项：改为可横向滑动的紧凑导航条 */
         #topnav nav {
           gap: 0.9rem;
+          min-width: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
-        #topnav nav a:not(.topnav-keep) {
+        #topnav nav::-webkit-scrollbar {
           display: none;
+        }
+        #topnav nav a {
+          font-size: 0.6rem;
+          letter-spacing: 0.08em;
+          white-space: nowrap;
+        }
+        .topnav-brand {
+          flex: 0 0 auto;
+          font-size: 0.95rem;
         }
       }
       @media (max-width: 900px) {
