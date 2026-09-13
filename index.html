@@ -564,6 +564,126 @@
         .scroll-cue i::after {
           animation: none;
         }
+        #topnav,
+        #back-to-top {
+          transition: none;
+        }
+      }
+
+      @media (max-width: 1100px) {
+        #topnav nav {
+          gap: 0.9rem;
+        }
+        #topnav nav a:not(.topnav-keep) {
+          display: none;
+        }
+      }
+      @media (max-width: 900px) {
+        #topnav {
+          padding: 0.7rem 6vw;
+        }
+        #back-to-top {
+          right: 16px;
+          bottom: 16px;
+        }
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  21 + 24 · STICKY 导航与锚点跳转                                     ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      #topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: 0.85rem 7vw;
+        border-bottom: 1px solid transparent;
+        transition: background 0.3s ease, border-color 0.3s ease;
+      }
+      #topnav.is-scrolled {
+        background: rgba(35, 46, 38, 0.86);
+        backdrop-filter: blur(12px);
+        border-bottom-color: var(--c-border);
+      }
+      .topnav-brand {
+        font-family: var(--f-heading);
+        font-size: 0.92rem;
+        letter-spacing: 0.04em;
+        color: var(--c-fg);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .topnav-brand span {
+        font-family: var(--f-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--c-fg-3);
+        margin-left: 0.5rem;
+      }
+      #topnav nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.15rem;
+      }
+      #topnav nav a {
+        font-family: var(--f-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--c-fg-3);
+        text-decoration: none;
+        padding-bottom: 2px;
+        border-bottom: 1px solid transparent;
+        transition: color 0.2s ease-out, border-color 0.2s ease-out;
+      }
+      #topnav nav a:hover,
+      #topnav nav a.is-active {
+        color: var(--c-accent);
+        border-bottom-color: var(--c-accent);
+      }
+      .section[id] {
+        scroll-margin-top: 56px;
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  30 · 返回顶部                                                       ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      #back-to-top {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 200;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--f-mono);
+        font-size: 1rem;
+        line-height: 1;
+        color: var(--c-fg);
+        background: rgba(35, 46, 38, 0.86);
+        border: 1px solid var(--c-border);
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease, background 0.2s ease,
+          border-color 0.2s ease;
+      }
+      #back-to-top.is-visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      #back-to-top:hover {
+        background: var(--c-accent);
+        border-color: var(--c-accent);
       }
 
       /* ╔══════════════════════════════════════════════════════════════════════╗
@@ -589,9 +709,26 @@
   <body>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!--  STICKY NAV (21) + ANCHOR LINKS (24)                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <header id="topnav">
+      <a class="topnav-brand" href="#top">章鱼<span>Octopus Way</span></a>
+      <nav aria-label="作品导航">
+        <a href="#hankey">字钥</a>
+        <a href="#tcsol">TCSOL</a>
+        <a href="#esg">ESG</a>
+        <a href="#beyond-jd">Beyond JD</a>
+        <a href="#strategy">生态策略</a>
+        <a href="#dictionary">视觉词典</a>
+        <a href="#fde">FDE</a>
+        <a href="#contact" class="topnav-keep">联系</a>
+      </nav>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 1 · COVER                                                    -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section section--cover" data-section="1">
+    <section class="section section--cover" id="top" data-section="1">
       <div class="cover-name">章鱼（Octopus Way）</div>
       <h1 class="cover-title">Always on the road</h1>
       <p class="cover-subtitle">Aspiring to be an AI Builder</p>
@@ -608,7 +745,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 2 · 核心定位                                                  -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="2">
+    <section class="section" id="thesis" data-section="2">
       <header class="section-chrome">
         <span class="label">The Thesis</span>
         <span class="label">02</span>
@@ -665,7 +802,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 3 · 字钥 HanKey                                              -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="3">
+    <section class="section" id="hankey" data-section="3">
       <header class="section-chrome">
         <span class="label">Product</span>
         <span class="label">03</span>
@@ -705,7 +842,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 4 · TCSOL                                                    -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="4">
+    <section class="section" id="tcsol" data-section="4">
       <header class="section-chrome">
         <span class="label">Methodology</span>
         <span class="label">04</span>
@@ -745,7 +882,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 5 · ESG Consultant                                           -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="5">
+    <section class="section" id="esg" data-section="5">
       <header class="section-chrome">
         <span class="label">Systematization</span>
         <span class="label">05</span>
@@ -784,7 +921,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 6 · Beyond JD                                                -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="6">
+    <section class="section" id="beyond-jd" data-section="6">
       <header class="section-chrome">
         <span class="label">Browser Tool</span>
         <span class="label">06</span>
@@ -824,7 +961,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 7 · WB产培实战 · Agent 资产生态策略                          -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="7">
+    <section class="section" id="strategy" data-section="7">
       <header class="section-chrome">
         <span class="label">Ecosystem Strategy</span>
         <span class="label">07</span>
@@ -863,7 +1000,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 8 · Vibe Coding 视觉词典 Skill                               -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="8">
+    <section class="section" id="dictionary" data-section="8">
       <header class="section-chrome">
         <span class="label">Knowledge Curation</span>
         <span class="label">08</span>
@@ -901,7 +1038,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 9 · FDE 内测 · 企业需求拆解                                   -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section" data-section="9">
+    <section class="section" id="fde" data-section="9">
       <header class="section-chrome">
         <span class="label">Enterprise Delivery</span>
         <span class="label">09</span>
@@ -913,18 +1050,18 @@
       <div class="card-row">
         <div class="card">
           <span class="rule"></span>
-          <div class="card-title">三份需求拆解文档</div>
-          <div class="card-desc">CRM 运维问答与人工升级、模糊报障转标准运维工单、知识库变更影响分析与更新清单</div>
+          <div class="card-title">企业需求拆解</div>
+          <div class="card-desc">把一线模糊诉求拆成可交付、可验收的方案结构，明确 Agent 的职责边界</div>
         </div>
         <div class="card">
           <span class="rule"></span>
           <div class="card-title">Skill 发布与验证</div>
-          <div class="card-desc">incident-to-ticket 技能发布落库，30 个样例端到端回归全部通过</div>
+          <div class="card-desc">从需求拆解到技能发布落库，附端到端回归验证，确认可用才交付</div>
         </div>
         <div class="card">
           <span class="rule"></span>
-          <div class="card-title">沙箱环境排障</div>
-          <div class="card-desc">定位 PowerShell 5.1 兜底 + 受限语言模式的根因链，产出一键部署脚本，全程可回滚</div>
+          <div class="card-title">环境排障与部署</div>
+          <div class="card-desc">定位环境故障的根因链，产出一键部署脚本，全程可回滚</div>
         </div>
       </div>
       <footer class="section-foot">
@@ -936,7 +1073,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!--  SECTION 10 · END / 联系                                              -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section section--end" data-section="10">
+    <section class="section section--end" id="contact" data-section="10">
       <div class="cover-name">章鱼（Octopus Way）</div>
       <h2 class="cover-title" style="font-size: clamp(2rem, 6vw, 5rem)">Always on the road</h2>
       <p class="cover-subtitle">Aspiring to be an AI Builder</p>
@@ -952,6 +1089,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <nav id="nav-dots" aria-label="Section navigation"></nav>
     <div id="progress" aria-hidden="true"></div>
+    <button id="back-to-top" type="button" aria-label="返回顶部">↑</button>
 
     <script>
       (function () {
@@ -960,6 +1098,11 @@
         ).matches;
         const sections = Array.from(document.querySelectorAll(".section"));
         const dotsNav = document.getElementById("nav-dots");
+        const topnav = document.getElementById("topnav");
+        const backTop = document.getElementById("back-to-top");
+        const navLinks = Array.from(
+          document.querySelectorAll("#topnav nav a")
+        );
 
         /* ── 导航圆点 ─────────────────────────────────────────────────── */
         sections.forEach(function (_, i) {
@@ -979,6 +1122,13 @@
                 const idx = sections.indexOf(entry.target);
                 dotsNav.querySelectorAll(".nav-dot").forEach(function (d, i) {
                   d.classList.toggle("is-active", i === idx);
+                });
+                const activeHref = "#" + entry.target.id;
+                navLinks.forEach(function (a) {
+                  a.classList.toggle(
+                    "is-active",
+                    a.getAttribute("href") === activeHref
+                  );
                 });
               }
             });
@@ -1042,6 +1192,8 @@
           const max = document.documentElement.scrollHeight - window.innerHeight;
           const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
           bar.style.width = pct.toFixed(2) + "%";
+          topnav.classList.toggle("is-scrolled", window.scrollY > 40);
+          backTop.classList.toggle("is-visible", window.scrollY > 800);
           ticking = false;
         }
         window.addEventListener(
@@ -1055,6 +1207,14 @@
           { passive: true }
         );
         updateProgress();
+
+        /* ── 30 · 返回顶部 ───────────────────────────────────────────── */
+        backTop.addEventListener("click", function () {
+          window.scrollTo({
+            top: 0,
+            behavior: reduceMotion ? "auto" : "smooth",
+          });
+        });
 
         /* ── 72 · 磁吸按钮（仅主 CTA，偏移 ≤ 6px） ────────────────────── */
         const finePointer = window.matchMedia(
