@@ -503,6 +503,84 @@
       }
 
       /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  50 · 滚动驱动动画 — 章节交接（内容随滚动连续进入 / 离场）           ║
+         ║  只在支持 animation-timeline: view() 的浏览器启用；启用时脚本里的     ║
+         ║  reveal 自动让位（见 JS 的 scrollDriven 判断），避免两套动画打架。    ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+      @media (prefers-reduced-motion: no-preference) {
+        @supports (animation-timeline: view()) {
+          .section > * {
+            animation: section-flow linear both;
+            animation-timeline: view();
+            animation-range: entry 8% exit 60%;
+          }
+          @keyframes section-flow {
+            0% {
+              opacity: 0;
+              transform: translateY(38px);
+            }
+            20% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+            84% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+            100% {
+              opacity: 0.5;
+              transform: translateY(-26px);
+            }
+          }
+
+          /* 42 · 背景光晕视差：与内容不同速，翻页时产生纵深 */
+          .section::before {
+            animation: glow-drift linear both;
+            animation-timeline: view();
+            animation-range: cover;
+          }
+          @keyframes glow-drift {
+            from {
+              transform: translateY(7%);
+            }
+            to {
+              transform: translateY(-7%);
+            }
+          }
+
+          /* 章节之间的承接细线：进入视口时自左向右画出 */
+          .section::after {
+            content: "";
+            position: absolute;
+            left: 7vw;
+            right: 7vw;
+            bottom: 0;
+            height: 1px;
+            background: linear-gradient(
+              90deg,
+              transparent,
+              rgba(192, 112, 48, 0.42),
+              transparent
+            );
+            transform-origin: left center;
+            animation: seam-draw linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 65%;
+          }
+          @keyframes seam-draw {
+            from {
+              transform: scaleX(0);
+              opacity: 0;
+            }
+            to {
+              transform: scaleX(1);
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      /* ╔══════════════════════════════════════════════════════════════════════╗
          ║  48 · 悬停微交互（卡片上移 + 边框转强调色 + 短线变长）               ║
          ╚══════════════════════════════════════════════════════════════════════╝ */
       .card {
@@ -687,6 +765,7 @@
         gap: 1.15rem;
       }
       #topnav nav a {
+        position: relative;
         font-family: var(--f-mono);
         font-size: 0.68rem;
         letter-spacing: 0.12em;
@@ -694,13 +773,39 @@
         color: var(--c-fg-3);
         text-decoration: none;
         padding-bottom: 2px;
-        border-bottom: 1px solid transparent;
-        transition: color 0.2s ease-out, border-color 0.2s ease-out;
+        transition: color 0.22s ease-out;
+      }
+      /* 下划线自左向右生长，取代硬切的状态色块 */
+      #topnav nav a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background: var(--c-accent);
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
       }
       #topnav nav a:hover,
       #topnav nav a.is-active {
         color: var(--c-accent);
-        border-bottom-color: var(--c-accent);
+      }
+      #topnav nav a:hover::after,
+      #topnav nav a.is-active::after {
+        transform: scaleX(1);
+      }
+      /* 键盘焦点可见 + 按钮按压反馈（触摸/鼠标都有触感） */
+      #topnav nav a:focus-visible,
+      .btn:focus-visible,
+      .end-contact a:focus-visible,
+      #back-to-top:focus-visible {
+        outline: 2px solid var(--c-accent);
+        outline-offset: 3px;
+      }
+      .btn:active {
+        transform: translateY(1px) scale(0.985);
       }
       .section[id] {
         scroll-margin-top: 56px;
@@ -1208,7 +1313,13 @@
           ".section-chrome, .project-head, .thesis-left, .cover-name, .cover-title, .cover-subtitle, .scroll-cue, .end-invite, .end-contact"
         );
 
-        if (!reduceMotion && "IntersectionObserver" in window) {
+        /* 支持滚动驱动动画时由 CSS 连续控制，脚本不再插手，避免两套动画打架 */
+        const scrollDriven =
+          typeof CSS !== "undefined" &&
+          CSS.supports &&
+          CSS.supports("animation-timeline: view()");
+
+        if (!reduceMotion && !scrollDriven && "IntersectionObserver" in window) {
           const revealObserver = new IntersectionObserver(
             function (entries) {
               entries.forEach(function (entry) {
