@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户需求到Agent分发链路设计 · 章鱼（Octopus Way）</title>
+<style>
+  :root{--ink:#1c1e21;--ink2:#4b5057;--ink3:#8a9099;--paper:#fafaf7;--card:#fff;--line:#e6e4de;--accent:#1f5eff;--accent-soft:#eef3ff;--warn:#b4540a;--warn-soft:#fdf3e7;--ok:#0e7a4d;--ok-soft:#e9f6ef;--code:#f4f3ef;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.85;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .page{max-width:880px;margin:0 auto;padding:64px 32px 40px;}
+  .cover{margin-bottom:56px;}
+  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;}
+  h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .sub{font-size:16.5px;color:var(--ink2);max-width:640px;margin-bottom:28px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13px;color:var(--ink3);border-top:1px solid var(--line);padding-top:16px;}
+  .meta b{color:var(--ink2);font-weight:600;}
+  section{margin-bottom:56px;}
+  .sec-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h2{font-size:25px;font-weight:700;line-height:1.5;margin-bottom:18px;}
+  h3{font-size:18px;font-weight:650;margin:30px 0 12px;}
+  p{margin-bottom:13px;color:var(--ink2);}
+  p strong,li strong{color:var(--ink);font-weight:650;}
+  ul,ol{padding-left:22px;margin-bottom:13px;color:var(--ink2);}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:3px solid var(--accent);padding:16px 20px;border-radius:0 10px 10px 0;margin:18px 0;font-size:15px;color:#2a3550;}
+  .callout b{font-weight:650;}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;background:var(--card);}
+  th{text-align:left;font-weight:650;color:var(--ink);font-size:13px;border-bottom:2px solid var(--ink);padding:9px 12px;white-space:nowrap;}
+  td{border-bottom:1px solid var(--line);padding:10px 12px;vertical-align:top;color:var(--ink2);}
+  tr:last-child td{border-bottom:none;}
+  .formula{font-family:Consolas,"Courier New",monospace;font-size:14px;background:var(--code);border-radius:9px;padding:14px 18px;margin:12px 0;overflow-x:auto;color:#2a2a2a;line-height:1.9;}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:56px;}
+  .toc h3{margin:0 0 10px;font-size:14px;color:var(--ink3);font-weight:600;letter-spacing:.1em;}
+  .toc ol{margin:0;padding-left:20px;font-size:14px;}
+  .toc a{color:var(--ink2);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  .pipe-step{display:grid;grid-template-columns:46px 1fr 120px;gap:14px;align-items:start;padding:12px 0;}
+  .pipe-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+  .pipe-step.rule .pipe-num{background:var(--ok);}
+  .pipe-step.human .pipe-num{background:#7a5af5;}
+  .pipe-body h4{margin:4px 0 4px;}
+  .pipe-body p{margin:0;font-size:14px;}
+  .who{font-size:13px;font-weight:650;text-align:right;display:block;}
+  @media(max-width:640px){.pipe-step{grid-template-columns:40px 1fr;}.who{grid-column:2;text-align:left;}}
+  .footer{border-top:1px solid var(--line);margin-top:28px;padding:22px 0 8px;font-size:13px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  @media print{body{background:#fff;}.page{padding:20px 0;}.toc{display:none;}section{page-break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="cover">
+    <div class="kicker">Agent Ecosystem Strategy · 02</div>
+    <h1>用户需求到Agent分发链路设计</h1>
+    <p class="sub">用户用一句话描述需求，链路负责找到最合适的那一个 Agent——并明确回答：每一步由规则、模型还是人来承担判断，为什么。</p>
+    <div class="meta">
+      <span>作者 <b>章鱼（Octopus Way）</b></span>
+      <span>联系 <b>octopus4takoyaki@outlook.com</b></span>
+      <span>日期 <b>2026 年 9 月</b></span>
+      <span>场景 <b>WorkBuddy 产培实战</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#s1">判断归属的三条准则</a></li>
+      <li><a href="#s2">链路总览</a></li>
+      <li><a href="#s3">各阶段详述</a></li>
+      <li><a href="#s4">失败路径</a></li>
+      <li><a href="#s5">加分项：马太效应抑制策略</a></li>
+      <li><a href="#s6">与平台现有系统的衔接</a></li>
+    </ol>
+  </nav>
+
+  <section id="s1">
+    <div class="sec-kicker">Principles</div>
+    <h2>判断归属的三条准则</h2>
+    <p>「规则、模型还是人」是成本与风险的匹配问题，不是偏好。三条准则：</p>
+    <table>
+      <tr><th>准则</th><th>适用</th><th>理由</th></tr>
+      <tr><td><b>A 规则</b></td><td>可解释、防操纵、涉公平的判断</td><td>规则确定、便宜、可申诉、可回滚</td></tr>
+      <tr><td><b>B 模型</b></td><td>语义泛化、匹配估计</td><td>只有模型能跨过表达差异；出错便宜</td></tr>
+      <tr><td><b>C 人</b></td><td>低频、高代价、价值权衡</td><td>人带宽宝贵，只花在规则和模型都不该拍板处</td></tr>
+    </table>
+    <p>兜底原则：旧关键词检索路径不封死，新链路靠「更好用」赢得迁移。</p>
+  </section>
+
+  <section id="s2">
+    <div class="sec-kicker">Overview</div>
+    <h2>链路总览</h2>
+    <div class="pipe-step model"><div class="pipe-num">1</div><div class="pipe-body"><h4>需求理解</h4><p>一句话解析为结构化需求</p></div><span class="who" style="color:var(--accent)">模型判断</span></div>
+    <div class="pipe-step rule"><div class="pipe-num">2</div><div class="pipe-body"><h4>多路召回</h4><p>双通道取候选，合并去重</p></div><span class="who" style="color:var(--ok)">规则 + 模型</span></div>
+    <div class="pipe-step rule"><div class="pipe-num">3</div><div class="pipe-body"><h4>粗排</h4><p>硬过滤 + 质量准入</p></div><span class="who" style="color:var(--ok)">规则判断</span></div>
+    <div class="pipe-step model"><div class="pipe-num">4</div><div class="pipe-body"><h4>精排</h4><p>匹配度 × 质量乘数 + 边际热度</p></div><span class="who" style="color:var(--accent)">模型算匹配 · 规则定公式</span></div>
+    <div class="pipe-step rule"><div class="pipe-num">5</div><div class="pipe-body"><h4>多样性重排</h4><p>马太抑制 + 去重 + 探索位</p></div><span class="who" style="color:var(--ok)">规则判断</span></div>
+    <div class="pipe-step model"><div class="pipe-num">6</div><div class="pipe-body"><h4>结果呈现</h4><p>生成「为什么选它」的归因</p></div><span class="who" style="color:var(--accent)">模型生成 · 规则供数</span></div>
+    <div class="pipe-step human"><div class="pipe-num">7</div><div class="pipe-body"><h4>人工介入</h4><p>申诉、安全终审、缺口供给</p></div><span class="who" style="color:#7a5af5">人判断</span></div>
+  </section>
+
+  <section id="s3">
+    <div class="sec-kicker">Stage Details</div>
+    <h2>各阶段详述</h2>
+    <h3>P1 需求理解 · 模型</h3>
+    <p>把用户原话解析为：核心意图、对象实体、约束条件、隐含目标。为什么是模型：用户表达与功能词汇之间没有可靠的词面映射，「整理访谈录音」不等于名称含「录音」的资产才匹配。规则词表维护成本随词汇发散，且追不上长尾表达。冗余设计：输出 2–3 个备选解析，并行进入召回，避免单次误解析导致整链路失败。</p>
+    <h3>P2 多路召回 · 规则 + 模型并行</h3>
+    <p>规则通道（保底）：类目标签、能力关键词、创作者声明的场景做精确匹配，命中即入候选，不可被语义通道挤掉。语义通道（泛化）：需求解析结果与资产描述/能力向量做近邻检索。为什么双通道：纯向量召回在头部资产上有偏差，且无法保证「明确声明一定被召回」。规则保下限，语义扩上限。</p>
+    <h3>P3 粗排 · 规则</h3>
+    <p>三条硬过滤：状态过滤（下架/暂停不入池）、相关性底线（召回分低于阈值剔除）、质量准入（质量分低于准入线剔除，观察池资产限量保留）。为什么是规则：每个判断直接影响资产能否参与分发，必须可解释、可申诉、难操纵。</p>
+    <h3>P4 精排 · 模型算匹配，规则定公式</h3>
+    <div class="formula">最终得分 = 匹配度 × 质量乘数 + 边际热度 × w_热度</div>
+    <ul>
+      <li><strong>匹配度</strong>（模型估计，∈ [0,1]）：给定这个需求，这个资产完成任务的贴合度。占主导。</li>
+      <li><strong>质量乘数</strong>（规则定，初始 0.8–1.2）：质量分的单调函数。新资产质量分置信度低时，乘数收敛到 1，先靠匹配度被选中。</li>
+      <li><strong>边际热度</strong>（规则算，权重 ~0.1）：近期选用增量，不是累计调用量。</li>
+    </ul>
+    <p>为什么匹配度交给模型、公式交给规则：逐对估计贴合度是语义判断，交给模型；但匹配度、质量乘数、热度的组合关系是公平与策略的落点，必须写成可解释、可标定的规则公式。</p>
+    <p>标定：乘数初始 0.8–1.2 对应「匹配度误差约 ±0.1~0.2」的假设。影子期验证「乘数介入前后与真实完成率的相关性」，变好则放大、变坏则回炉。长期由 learning-to-rank 从「点击 → 完成」数据学权重，人工乘数退位。</p>
+    <h3>P5 多样性重排 · 规则</h3>
+    <p>确定性调整：同类目去重（Top 5 至少覆盖 3 个类目）、马太抑制（见第五部分）、探索位（为观察池资产保留展示位）。为什么是规则：生态公平的直接执行环节，必须可公开、可复现、可设上限、可回滚。公平不能是概率性的。</p>
+    <h3>P6 结果呈现 · 模型</h3>
+    <p>为 Top 结果生成归因说明，例如「支持说话人分离并直接输出结构化纪要，近 30 天同类任务完成率 88%」。同时展示备选及差异点。数据引用由规则层提供，模型只负责表达，防止编造。</p>
+    <h3>P7 人工介入 · 人</h3>
+    <table>
+      <tr><th>场景</th><th>为什么是人</th><th>时效</th></tr>
+      <tr><td>降权/暂停/下架申诉仲裁</td><td>涉及创作者利益与平台公信力，需终审通道</td><td>≤ 72 小时</td></tr>
+      <tr><td>安全与合规终审</td><td>安全边界的裁量不可下放给自动化</td><td>即时</td></tr>
+      <tr><td>供给缺口组织</td><td>反复出现的未满足需求，需组织创作者补供给</td><td>按批次</td></tr>
+      <tr><td>策略灰度审批与护栏处置</td><td>副作用判定涉及价值权衡</td><td>按发布节奏</td></tr>
+    </table>
+  </section>
+
+  <section id="s4">
+    <div class="sec-kicker">Failure Path</div>
+    <h2>失败路径</h2>
+    <p>用户数据：三次匹配不中即放弃。失败路径的目标是把放弃点变成分流点：</p>
+    <table>
+      <tr><th>尝试</th><th>系统行为</th><th>意图</th></tr>
+      <tr><td>第 1 次</td><td>完整走 P1–P6，展示 Top 5 与归因</td><td>给足命中机会</td></tr>
+      <tr><td>第 2 次</td><td>先澄清（列出模型不确定的约束让用户勾选），带澄清重跑</td><td>多数未命中源于表达歧义</td></tr>
+      <tr><td>第 3 次</td><td>放宽匹配阈值，展示「接近但不完全满足」的资产并标注差距</td><td>用户可能接受 80% 方案</td></tr>
+      <tr><td>仍未命中</td><td>一键切回关键词检索；需求写入「供给缺口」队列</td><td>尊重旧习惯，未满足需求回流</td></tr>
+    </table>
+    <p>关键取舍：不在第三次之后纠缠。反复失败透支信任，干净的退出是长期留存的一部分。</p>
+  </section>
+
+  <section id="s5">
+    <div class="sec-kicker">Bonus · Anti-Matthew</div>
+    <h2>加分项：马太效应抑制策略</h2>
+    <h3>问题还原</h3>
+    <p>马太效应是反馈环：曝光 → 产生调用数据 → 数据成为排序证据 → 更多曝光。环能转起来，是因为把「被用过很多次」当成了「值得被用」。两者只在边际上等价：头部资产第 10000 次调用的新信息，远小于长尾资产第 10 次。抑制的本质是<strong>纠正对「量」的定价——让边际信息量，而非累计量，决定曝光的边际分配</strong>。</p>
+    <p>红线：抑制针对分布状态（集中度超标这一事实），不针对具体资产。集中度健康时，任何资产不受影响。</p>
+    <h3>判定信号（三信号同时满足才激活）</h3>
+    <table>
+      <tr><th>信号</th><th>定义</th></tr>
+      <tr><td>头部曝光占比增速</td><td>Top 5% 资产曝光占比的 7 日斜率连续两周上行</td></tr>
+      <tr><td>边际选用率递减</td><td>头部资产曝光每增 1 单位，选用转化率增量持续为负</td></tr>
+      <tr><td>需求覆盖熵下降</td><td>曝光在需求簇上的分布熵连续下滑</td></tr>
+    </table>
+    <h3>抑制手段</h3>
+    <table>
+      <tr><th>手段</th><th>做法</th></tr>
+      <tr><td>曝光预算</td><td>Top 5% 资产曝光份额设上限，超出部分释放给中长尾</td></tr>
+      <tr><td>边际热度</td><td>热度项用「近期选用增量」，累计量不再加分（P4 公式的落点）</td></tr>
+      <tr><td>探索位</td><td>固定预算（2%–5%）为观察池与长尾资产保留展示位，按需求簇轮换</td></tr>
+    </table>
+    <h3>起作用信号</h3>
+    <table>
+      <tr><th>信号</th><th>方向</th><th>说明</th></tr>
+      <tr><td>长尾三次内命中率</td><td>↑</td><td>策略直接目标</td></tr>
+      <tr><td>头部任务完成率</td><td>持平（±2pp 内）</td><td>证明抑制的是「多余曝光」而非「应得曝光」</td></tr>
+      <tr><td>曝光集中度增速</td><td>归零或转负</td><td>机械指标</td></tr>
+      <tr><td>新资产 14 天达标率</td><td>↑（对照 8% 基线）</td><td>长期生态活力</td></tr>
+    </table>
+    <p>前两条为主：长尾命中率上升而头部完成率不降，才算真的起作用，而不是把流量从 A 搬到 B。</p>
+    <h3>副作用控制</h3>
+    <table>
+      <tr><th>副作用</th><th>控制</th></tr>
+      <tr><td>用户满意度受损</td><td>满意度与命中率为护栏，跌破基线 2 个标准差自动回退当日参数</td></tr>
+      <tr><td>抑制过度误伤头部</td><td>单周期幅度 ≤15%；质量分前 10% 的头部资产白名单，只受预算约束</td></tr>
+      <tr><td>创作者感知不公</td><td>规则全量公开；抑制通知附本资产受影响的具体数据</td></tr>
+      <tr><td>头部拆分资产规避预算</td><td>预算按创作者主体 + 资产双维度计算，合并计量</td></tr>
+    </table>
+    <h3>未来演进：从规则到模型</h3>
+    <p>以上是「规则版」，可解释、可上线。它有三处不足：参数靠拍、曝光预算不看边际价值、未显式建模位置偏差。数据积累到一定量后，应升级为带探索项和公平约束的排序模型——上下文老虎机 / learning-to-rank + 位置去偏 + 公平正则。这正好是 P4「长期由 learning-to-rank 接管」的落地。</p>
+  </section>
+
+  <section id="s6">
+    <div class="sec-kicker">Integration</div>
+    <h2>与平台现有系统的衔接</h2>
+    <table>
+      <tr><th>已有能力</th><th>本链路的用法</th></tr>
+      <tr><td>通用大模型 + 工作流编排</td><td>P1 需求理解、P4 匹配度、P6 归因生成、合成任务评测</td></tr>
+      <tr><td>曝光位 / 推荐位</td><td>P5 重排结果直接写入；探索位复用推荐位配置</td></tr>
+      <tr><td>搜索排序接口</td><td>旧关键词检索原样保留，新链路独立入口，灰度期分流</td></tr>
+      <tr><td>创作者后台</td><td>质量分归因、抑制通知、申诉入口挂在这里</td></tr>
+      <tr><td>激励结算通道</td><td>观察池与探索位流量按现有通道正常计费</td></tr>
+    </table>
+    <div class="callout"><b>与 01、03 的关系：</b>P3/P4 使用的质量分来自 01 号框架；P4 的边际热度是「调用量不是质量」的落地；链路效果由 03 号指标方案度量。可交互演示见 <a href="prototype.html">prototype.html</a>。</div>
+  </section>
+
+  <footer class="footer">
+    <span>《用户需求到Agent分发链路设计》· WorkBuddy 产培实战</span>
+    <span>章鱼（Octopus Way） · octopus4takoyaki@outlook.com · 2026-09</span>
+  </footer>
+</div>
+</body>
+</html>

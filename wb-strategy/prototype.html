@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长尾需求匹配演示 · WorkBuddy Agent 分发</title>
+<style>
+  :root{
+    --ink:#1c1e21; --ink-2:#4b5057; --ink-3:#8a9099;
+    --paper:#f7f7f4; --card:#ffffff; --line:#e6e4de;
+    --accent:#1f5eff; --accent-soft:#eef3ff;
+    --warn:#b4540a; --warn-soft:#fdf3e7;
+    --ok:#0e7a4d; --ok-soft:#e9f6ef;
+    --red:#b3261e; --red-soft:#fdeaea;
+    --code:#f4f3ef;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.7; font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:980px;margin:0 auto;padding:44px 24px 60px;}
+  header{margin-bottom:22px;}
+  .kicker{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:12px;}
+  h1{font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.5;margin-bottom:8px;}
+  .sub{font-size:14.5px;color:var(--ink-2);max-width:720px;}
+  .meta{font-size:12.5px;color:var(--ink-3);margin-top:10px;}
+
+  .context-note{
+    background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;
+    padding:14px 18px;margin:18px 0;font-size:13.5px;color:#2a3550;
+  }
+  .context-note b{color:var(--ink);}
+
+  .ctrl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px;}
+  .ctrl-label{font-size:12px;letter-spacing:.1em;color:var(--ink-3);font-weight:600;margin-bottom:10px;}
+  .scn-row{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px;}
+  .scn-btn{
+    border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:9px 14px;
+    font-size:13.5px;cursor:pointer;color:var(--ink-2);font-family:inherit;text-align:left;transition:.15s;
+  }
+  .scn-btn:hover{border-color:var(--accent);}
+  .scn-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--ink);}
+  .scn-btn .t{font-weight:650;display:block;}
+  .scn-btn .d{font-size:11.5px;color:var(--ink-3);}
+  .input-row{display:flex;gap:10px;margin-bottom:12px;}
+  .input-row input{
+    flex:1;border:1px solid var(--line);border-radius:9px;padding:10px 14px;font-size:14px;font-family:inherit;background:var(--paper);color:var(--ink);
+  }
+  .input-row input:focus{outline:none;border-color:var(--accent);}
+  .run-btn{border:none;background:var(--accent);color:#fff;border-radius:9px;padding:10px 22px;font-size:14px;font-weight:650;cursor:pointer;font-family:inherit;}
+  .run-btn:hover{filter:brightness(1.08);}
+
+  .switch-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .switch{position:relative;width:50px;height:27px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;cursor:pointer;inset:0;background:#c9c7c0;border-radius:99px;transition:.2s;}
+  .slider:before{content:"";position:absolute;height:21px;width:21px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+  .switch input:checked + .slider{background:var(--ok);}
+  .switch input:checked + .slider:before{transform:translateX(23px);}
+  .switch-desc{font-size:13px;color:var(--ink-2);}
+  .mode-on{color:var(--ok);font-weight:650;}
+  .mode-off{color:var(--red);font-weight:650;}
+
+  .steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .step-chip{
+    display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);
+    border-radius:99px;padding:6px 13px;font-size:12.5px;cursor:pointer;color:var(--ink-3);font-family:inherit;transition:.15s;
+  }
+  .step-chip .n{width:18px;height:18px;border-radius:50%;background:var(--code);display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--ink-2);}
+  .step-chip.active{border-color:var(--accent);color:var(--ink);background:var(--accent-soft);}
+  .step-chip.active .n{background:var(--accent);color:#fff;}
+  .step-chip.done .n{background:var(--ok);color:#fff;}
+  .step-chip:disabled{opacity:.4;cursor:not-allowed;}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;min-height:330px;}
+  .panel-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+  .panel-head h2{font-size:18px;font-weight:700;}
+  .owner{font-size:12px;font-weight:650;padding:2px 11px;border-radius:99px;}
+  .owner.model{background:var(--accent-soft);color:var(--accent);}
+  .owner.rule{background:var(--ok-soft);color:var(--ok);}
+  .panel-why{font-size:13px;color:var(--ink-3);margin-bottom:16px;padding-bottom:13px;border-bottom:1px dashed var(--line);}
+  .panel-why b{color:var(--ink-2);}
+
+  .nav-row{display:flex;justify-content:space-between;margin-top:14px;}
+  .nav-btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 18px;font-size:13px;cursor:pointer;color:var(--ink-2);font-family:inherit;}
+  .nav-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .nav-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
+  th{text-align:left;font-weight:650;color:var(--ink);font-size:12px;border-bottom:2px solid var(--ink);padding:7px 9px;white-space:nowrap;}
+  td{border-bottom:1px solid var(--line);padding:8px 9px;vertical-align:middle;color:var(--ink-2);}
+  tr:last-child td{border-bottom:none;}
+  .mono{font-family:Consolas,"Courier New",monospace;font-size:12px;}
+  .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;font-weight:600;margin-right:4px;}
+  .pill.head{background:var(--red-soft);color:var(--red);}
+  .pill.tail{background:var(--accent-soft);color:var(--accent);}
+  .pill.obs{background:var(--warn-soft);color:var(--warn);}
+  .tagchip{display:inline-block;font-size:11.5px;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 8px;margin:2px 3px 2px 0;font-weight:600;}
+  .bar-row{display:grid;grid-template-columns:86px 1fr 40px;gap:10px;align-items:center;margin:4px 0;font-size:12px;}
+  .bar-track{height:8px;background:var(--code);border-radius:99px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .4s;}
+  .bar-fill.g{background:var(--ok);}.bar-fill.w{background:var(--warn);}
+  .quote{background:var(--accent-soft);border-radius:9px;padding:11px 15px;font-size:13.5px;color:#2a3550;margin-bottom:12px;}
+  .quote b{color:var(--ink);}
+  .up{color:var(--ok);font-weight:700;}.down{color:var(--red);font-weight:700;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+  .winner{border:2px solid var(--ok);border-radius:12px;padding:20px 22px;background:var(--ok-soft);}
+  .winner h3{font-size:19px;margin-bottom:4px;}
+  .winner .why{font-size:13.5px;color:#174d34;margin-top:10px;}
+  .fail-step{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:9px;padding:12px 16px;margin:9px 0;background:#fffdf9;}
+  .fail-step b.t{display:block;margin-bottom:2px;}
+  .fail-step p{font-size:13px;color:var(--ink-2);margin:0;}
+  .note{font-size:12px;color:var(--ink-3);margin-top:10px;}
+  details.lib{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+  details.lib summary{cursor:pointer;font-weight:650;font-size:13.5px;color:var(--ink-2);}
+  .disclaimer{font-size:12px;color:var(--ink-3);margin-top:16px;padding-top:12px;border-top:1px solid var(--line);}
+  .footer{font-size:12.5px;color:var(--ink-3);margin-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="kicker">WorkBuddy · Agent 分发链路 · 可交互演示</div>
+    <h1>长尾需求被非头部资产命中的完整过程</h1>
+    <p class="sub">演示平台内部如何把一个口语化的长尾需求，一步步匹配到那个调用量很低、但真正能办事的 Agent。</p>
+    <div class="meta">章鱼（Octopus Way） · octopus4takoyaki@outlook.com · 2026-09 · 配套文档：<a href="02-demand-to-distribution-pipeline.html">分发链路设计</a></div>
+  </header>
+
+  <div class="context-note">
+    <b>情境说明：</b>用户在任务会话框用自然语言描述需求，平台在内部自动匹配并调用 Agent。用户不主动挑 Agent（资产库对他不可见），但能通过「结果好不好」感知匹配是否命中。下面的演示，是把这段内部过程掀开来看。<b>本页全部资产、调用量、评分、需求均为编排的模拟数据，用于演示机制，不是真实生产数据。</b>
+  </div>
+
+  <div class="ctrl">
+    <div class="ctrl-label">选择或输入一个用户需求</div>
+    <div class="scn-row" id="scnRow"></div>
+    <div class="input-row">
+      <input id="freeInput" type="text" placeholder="也可以自由输入一句话需求，例如：把这份报告翻译成英文" />
+      <button class="run-btn" onclick="runFlow()">运行匹配</button>
+    </div>
+    <div class="switch-row">
+      <label class="switch"><input type="checkbox" id="matthewSwitch" checked onchange="onSwitch()"><span class="slider"></span></label>
+      <div class="switch-desc" id="switchDesc"></div>
+    </div>
+  </div>
+
+  <div class="steps" id="stepsRow"></div>
+  <div class="panel" id="panel"></div>
+  <div class="nav-row">
+    <button class="nav-btn" id="prevBtn" onclick="nav(-1)">← 上一步</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nav(1)">下一步 →</button>
+  </div>
+
+  <details class="lib">
+    <summary>查看模拟资产库（12 个资产 · 3 头部 + 9 长尾）</summary>
+    <div id="libBody"></div>
+  </details>
+
+  <div class="disclaimer">
+    <b>为什么以「访谈录音整理」为例：</b>这个需求同时具备长尾需求的三个特征——①表达口语化（用户不会说「调用转写+说话人分离+摘要三个工具」，所以关键词搜不到）；②能力是组合式的（转写+分离+纪要+摘要四件事，头部通用资产干不了）；③真正能干的是冷门资产（调用量仅几百的「逐字稿整理员」，在热度主导下排不上来）。三个特征对应题目要解决的三个痛点，所以拿它做主线。
+  </div>
+
+  <div class="footer">
+    <span>演示用模拟数据 · 交互原型 · WorkBuddy 产培实战</span>
+    <span>章鱼（Octopus Way） · octopus4takoyaki@outlook.com · 2026-09</span>
+  </div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+/* 质量分 = 七维加权合成（任务完成/推理/工具/效率/记忆/鲁棒/安全），此处为演示设定值 */
+var W = {match:0, quality:0, popCum:0, popMar:0}; /* 占位，实际公式见 scoreNew/scoreOld */
+var ASSETS = [
+ {id:"a1", name:"全能办公助手", creator:"星辰工坊", head:true, calls:52000, calls30:12000, rating:4.4, fail:0.34, quality:0.64, weeks:60, obs:false,
+  tags:["办公","写作","周报","纪要","数据","邮件","通用"], desc:"覆盖写作、纪要、数据、邮件等多场景的通用办公助手"},
+ {id:"a2", name:"周报快写", creator:"效率岛", head:true, calls:31000, calls30:8000, rating:4.5, fail:0.22, quality:0.75, weeks:48, obs:false,
+  tags:["写作","周报","汇报"], desc:"从工作碎片快速生成结构化周报"},
+ {id:"a3", name:"会议纪要大师", creator:"声浪科技", head:true, calls:18500, calls30:4500, rating:4.3, fail:0.38, quality:0.57, weeks:40, obs:false,
+  tags:["纪要","会议","转写","摘要"], desc:"会议录音转纪要，支持摘要与待办提取"},
+ {id:"a4", name:"逐字稿整理员", creator:"田野笔记", head:false, calls:180, calls30:120, rating:4.7, fail:0.12, quality:0.78, weeks:6, obs:false,
+  tags:["转写","纪要","说话人","访谈","摘要","整理"], desc:"访谈与对话录音整理，说话人分离，输出结构化纪要与要点摘要"},
+ {id:"a5", name:"音频转写小匠", creator:"声浪科技", head:false, calls:640, calls30:180, rating:4.5, fail:0.18, quality:0.70, weeks:20, obs:false,
+  tags:["转写","录音","音频"], desc:"音频文件转文字，快速出逐字稿"},
+ {id:"a6", name:"周报拼图", creator:"效率岛", head:false, calls:95, calls30:80, rating:4.6, fail:0.15, quality:0.71, weeks:4, obs:false,
+  tags:["周报","汇报","汇总"], desc:"把零散记录拼装成周报草稿"},
+ {id:"a7", name:"数据速览", creator:"格物数据", head:false, calls:210, calls30:40, rating:4.2, fail:0.20, quality:0.66, weeks:12, obs:false,
+  tags:["数据","汇总","报表"], desc:"表格数据快速汇总与图表速览"},
+ {id:"a8", name:"邮件润色台", creator:"文思泉涌", head:false, calls:430, calls30:70, rating:4.6, fail:0.09, quality:0.78, weeks:16, obs:false,
+  tags:["邮件","写作"], desc:"商务邮件措辞润色与语气调整"},
+ {id:"a9", name:"翻译对照本", creator:"文思泉涌", head:false, calls:260, calls30:50, rating:4.4, fail:0.11, quality:0.72, weeks:14, obs:false,
+  tags:["翻译"], desc:"中英对照翻译，保留术语一致性"},
+ {id:"a10", name:"代码体检官", creator:"格物数据", head:false, calls:120, calls30:30, rating:4.1, fail:0.16, quality:0.65, weeks:8, obs:false,
+  tags:["代码"], desc:"代码片段静态检查与改进建议"},
+ {id:"a11", name:"幻灯片排排版", creator:"星辰工坊", head:false, calls:310, calls30:60, rating:4.3, fail:0.19, quality:0.67, weeks:10, obs:false,
+  tags:["幻灯片","演示"], desc:"演示文稿结构梳理与排版建议"},
+ {id:"a12", name:"服务器迁移向导", creator:"格物数据", head:false, calls:45, calls30:30, rating:3.9, fail:0.24, quality:0.42, weeks:3, obs:true,
+  tags:["服务器","迁移","网站"], desc:"网站迁移操作指引与检查清单"}
+];
+
+/* 七维展示数据（用于「质量评估」步骤的主角资产雷达条） */
+var DIMS = {
+  a4: {task:0.86, reason:0.75, tool:0.82, eff:0.80, mem:null, robust:0.78, safety:0.95},
+  a3: {task:0.55, reason:0.60, tool:0.62, eff:0.48, mem:null, robust:0.50, safety:0.80}
+};
+var DIM_NAMES = [
+  ["task","任务完成"],["reason","推理规划"],["tool","工具调用"],["eff","轨迹效率"],
+  ["mem","记忆·多轮"],["robust","鲁棒恢复"],["safety","安全合规"]
+];
+
+var SCENARIOS = [
+ {id:"longtail", btn:"长尾需求", desc:"访谈录音→说话人分离纪要",
+  input:"把这段访谈录音整理成带说话人区分的会议纪要，再提炼周报要点",
+  needTags:["转写","说话人","纪要","摘要"],
+  chips:["音频转文字","说话人分离","结构化纪要","要点摘要"],
+  match:{a4:0.95,a3:0.72,a5:0.66,a6:0.50,a2:0.48,a1:0.45},
+  ruleHits:["a4","a3","a5"], semHits:["a6","a2","a1"],
+  note:"需求是口语化的、组合式的：用户没说「调用转写工具」，而是说「整理成纪要」。关键词搜不到，因为资产命名里没有「整理录音」这样的词。"},
+ {id:"head", btn:"头部需求", desc:"写一份工作周报",
+  input:"帮我写一份本周的工作周报",
+  needTags:["周报","写作","汇报"],
+  chips:["文本生成","周报","结构化输出"],
+  match:{a2:0.93,a6:0.78,a1:0.72,a3:0.30,a8:0.25},
+  ruleHits:["a2","a1","a6"], semHits:["a3","a8"],
+  note:"对照场景：头部资产「周报快写」与需求高度匹配且质量健康，马太抑制不应伤害它——验证「抑制针对分布，不针对资产」。"},
+ {id:"fail", btn:"未满足需求", desc:"网站迁移+SEO 保障",
+  input:"帮我把公司网站迁移到新服务器，并保证搜索排名不下降",
+  needTags:["服务器","迁移","网站"],
+  chips:["网站迁移","服务器操作","SEO保障"],
+  match:{a12:0.50,a10:0.20},
+  ruleHits:["a12"], semHits:["a10"],
+  note:"池内没有资产能完整覆盖该需求（尤其「SEO 排名保障」无人声明能力）。链路走完三次尝试后开放兜底，并把缺口写入供给队列。"}
+];
+
+var KEYMAP = [
+ {k:["录音","转写","逐字稿","说话人","访谈"], tag:"转写"},
+ {k:["纪要","会议记录"], tag:"纪要"},
+ {k:["摘要","要点","提炼"], tag:"摘要"},
+ {k:["周报","日报","汇报"], tag:"周报"},
+ {k:["写作","文案","文章"], tag:"写作"},
+ {k:["翻译","英文","中英"], tag:"翻译"},
+ {k:["邮件"], tag:"邮件"},
+ {k:["数据","报表","汇总"], tag:"数据"},
+ {k:["幻灯片","ppt","演示"], tag:"幻灯片"},
+ {k:["代码","bug","程序"], tag:"代码"},
+ {k:["服务器","迁移","网站"], tag:"服务器"}
+];
+
+/* ================= 核心计算 ================= */
+function byId(id){ return ASSETS.find(function(a){return a.id===id;}); }
+function popCum(a){ return Math.log(1+a.calls)/Math.log(1+52000); }
+function popMar(a){ return a.calls30/a.calls; }  /* 边际热度 = 近期选用增量 / 存量，头部低、长尾高 */
+function qualityMul(a){ if(a.obs) return 1.0; return 0.8 + 0.4*a.quality; }  /* 观察池资产置信度低，乘数收敛到 1 */
+function pill(a){ var p = a.head ? '<span class="pill head">头部</span>' : '<span class="pill tail">长尾</span>'; if(a.obs) p+='<span class="pill obs">观察池</span>'; return p; }
+function matthewOn(){ return document.getElementById("matthewSwitch").checked; }
+
+/* 新链路：最终分 = 匹配度 × 质量乘数 + 边际热度 × 0.1 */
+function scoreNew(a, m){ return m*qualityMul(a) + popMar(a)*0.1; }
+/* 旧路径：热度主导 = 匹配度×0.3 + 质量×0.15 + 累计热度×0.55 */
+function scoreOld(a, m){ return m*0.3 + a.quality*0.15 + popCum(a)*0.55; }
+
+function rank(match, mode){
+  return Object.keys(match).map(function(id){
+    var a = byId(id); var s = mode==="new" ? scoreNew(a, match[id]) : scoreOld(a, match[id]);
+    return {a:a, m:match[id], s:s};
+  }).sort(function(x,y){return y.s-x.s;});
+}
+
+/* ================= 状态 ================= */
+var state = {scn:null, step:0, maxStep:0};
+var STEP_META = [
+ {t:"需求理解", owner:"model", ownerText:"模型判断",
+  why:"用户表达与资产命名之间没有可靠的词面映射，只有语义解析能跨过这个鸿沟。解析输出含多个备选，防止单次误解析导致整链路失败。"},
+ {t:"多路召回", owner:"rule", ownerText:"规则 + 模型并行",
+  why:"规则通道保证「明确声明过能力」的资产一定被找到（可审计下限）；语义通道补长尾表达（泛化上限）。两路取并集。"},
+ {t:"质量评估", owner:"rule", ownerText:"规则层 · 七维打分",
+  why:"质量分是「它本身好不好」，与「合不合」分开。调用量不进质量分——它只用于热度先验。"},
+ {t:"精排", owner:"model", ownerText:"模型算匹配 · 规则定公式",
+  why:"匹配度占主导，质量分做乘数（0.8–1.2），边际热度做小项。公式是规则写死的，可解释、可标定。"},
+ {t:"马太抑制", owner:"rule", ownerText:"规则判断",
+  why:"热度项用「边际热度」而非累计量：头部资产存量饱和、边际增速慢，长尾资产起步快增、边际高。这本身就是对马太的抑制。"},
+ {t:"结果呈现", owner:"model", ownerText:"自动调用 · 模型归因",
+  why:"平台自动调用命中的 Agent，并生成「为什么是它」的归因。用户不主动挑 Agent，但能看到结果与理由。"}
+];
+
+/* ================= 场景 ================= */
+function buildFree(text){
+  var needTags=[], chips=[];
+  KEYMAP.forEach(function(km){
+    for(var i=0;i<km.k.length;i++){ if(text.indexOf(km.k[i])>=0){ needTags.push(km.tag); chips.push(km.tag); break; } }
+  });
+  needTags = needTags.filter(function(v,i,s){return s.indexOf(v)===i;});
+  if(needTags.length===0){
+    return Object.assign({}, SCENARIOS[2], {input:text, chips:[text.slice(0,14)], needTags:[],
+      note:"未在需求词表中识别到已知能力域（真实系统由大模型解析，此处简化演示走失败路径）。"});
+  }
+  var ruleHits=[], semHits=[], match={};
+  ASSETS.forEach(function(a){
+    var hits = a.tags.filter(function(t){return needTags.indexOf(t)>=0;});
+    if(hits.length>0){ match[a.id]=+Math.min(0.97, 0.45+0.16*hits.length).toFixed(2); ruleHits.push(a.id); }
+    else if(a.tags.indexOf("通用")>=0){ match[a.id]=0.42; semHits.push(a.id); }
+  });
+  if(Object.keys(match).length===0){
+    return Object.assign({}, SCENARIOS[2], {input:text, chips:chips, needTags:needTags,
+      note:"池内没有资产覆盖该需求域，走失败路径。"});
+  }
+  return {id:"free", btn:"自由输入", desc:text.slice(0,20), input:text, needTags:needTags, chips:chips,
+    match:match, ruleHits:ruleHits, semHits:semHits, note:"自由输入解析出能力域：「"+needTags.join("、")+"」。"};
+}
+
+function setScn(scn, free){
+  state.scn = scn; state.step = 0; state.maxStep = 0;
+  document.querySelectorAll(".scn-btn").forEach(function(b){b.classList.remove("active");});
+  if(!free){ var btn = document.querySelector('.scn-btn[data-id="'+scn.id+'"]'); if(btn) btn.classList.add("active"); document.getElementById("freeInput").value=""; }
+  render(); updateNav();
+}
+function runFlow(){
+  var txt = document.getElementById("freeInput").value.trim();
+  var active = document.querySelector(".scn-btn.active");
+  if(txt){ setScn(buildFree(txt), true); }
+  else if(active){ var scn = SCENARIOS.find(function(s){return s.id===active.dataset.id;}); setScn(scn, false); }
+  else { setScn(SCENARIOS[0], false); }
+  var i=0;
+  var t = setInterval(function(){
+    i++; if(i>5){ clearInterval(t); return; }
+    if(i>state.maxStep) state.maxStep=i;
+    state.step=i; render(); updateNav();
+  }, 850);
+}
+
+/* ================= 渲染 ================= */
+function renderScn(){
+  document.getElementById("scnRow").innerHTML = SCENARIOS.map(function(s){
+    return '<button class="scn-btn" data-id="'+s.id+'" onclick="setScn(SCENARIOS.find(function(x){return x.id==\''+s.id+'\'}),false)">'+
+      '<span class="t">'+s.btn+'</span><span class="d">'+s.desc+'</span></button>';
+  }).join("");
+}
+function renderSwitch(){
+  document.getElementById("switchDesc").innerHTML = matthewOn()
+    ? '当前：<span class="mode-on">新链路（匹配度 × 质量乘数 + 边际热度 × 0.1）</span>'
+    : '当前：<span class="mode-off">旧路径（累计热度 × 0.55 主导 · 无抑制）</span> —— 头部资产凭存量调用量占位';
+}
+function onSwitch(){ renderSwitch(); if(state.scn){ render(); } }
+
+function renderSteps(){
+  document.getElementById("stepsRow").innerHTML = STEP_META.map(function(m,i){
+    var cls = "step-chip"; if(i===state.step) cls+=" active"; else if(i<state.maxStep) cls+=" done";
+    var dis = i>state.maxStep ? "disabled" : "";
+    return '<button class="'+cls+'" '+dis+' onclick="go('+i+')"><span class="n">'+(i+1)+'</span>'+m.t+'</button>';
+  }).join("");
+}
+function go(i){ state.step=i; if(i>state.maxStep) state.maxStep=i; render(); updateNav(); }
+function nav(d){ go(Math.min(5, Math.max(0, state.step+d))); }
+function updateNav(){
+  document.getElementById("prevBtn").disabled = state.step===0;
+  var nb = document.getElementById("nextBtn");
+  if(state.step>=5){ nb.disabled=true; nb.textContent="已完成"; }
+  else { nb.disabled=false; nb.textContent="下一步 →"; }
+}
+
+function bar(v){ var cls = v>=0.75?'g':(v<0.5?'w':''); return '<div class="bar-track"><div class="bar-fill '+cls+'" style="width:'+(v*100)+'%"></div></div>'; }
+
+function s0(){
+  var s = state.scn;
+  return '<div class="quote"><b>用户输入：</b>「'+s.input+'」</div>'+
+  '<h4 style="margin:12px 0 6px">解析结果</h4>'+
+  '<div>'+s.chips.map(function(c){return '<span class="tagchip">'+c+'</span>';}).join('')+'</div>'+
+  '<h4 style="margin:12px 0 6px">能力域标签（供召回使用）</h4>'+
+  '<div>'+(s.needTags.length? s.needTags.map(function(t){return '<span class="tagchip">#'+t+'</span>';}).join('') : '<span class="note">未识别到已知能力域</span>')+'</div>'+
+  '<div class="note">'+s.note+'</div>';
+}
+function s1(){
+  var s = state.scn;
+  function rows(ids){ return ids.map(function(id){ var a=byId(id); return '<tr><td><b>'+a.name+'</b> '+pill(a)+'</td><td class="mono">'+a.calls.toLocaleString()+'</td><td>'+a.desc+'</td></tr>'; }).join(""); }
+  var union = s.ruleHits.concat(s.semHits.filter(function(x){return s.ruleHits.indexOf(x)<0;}));
+  return '<div class="grid2">'+
+    '<div><h4 style="margin:0 0 6px">规则通道 · 命中 '+s.ruleHits.length+'</h4><table><tr><th>资产</th><th>累计调用</th><th>声明能力</th></tr>'+rows(s.ruleHits)+'</table></div>'+
+    '<div><h4 style="margin:0 0 6px">语义通道 · 补充 '+s.semHits.length+'</h4><table><tr><th>资产</th><th>累计调用</th><th>语义关联</th></tr>'+rows(s.semHits)+'</table></div>'+
+  '</div><div class="note">两路取并集，共 '+union.length+' 个候选进入下一步。</div>';
+}
+function s2(){
+  var s = state.scn;
+  var ids = Object.keys(s.match);
+  var rows = ids.map(function(id){ var a=byId(id); return '<tr><td><b>'+a.name+'</b> '+pill(a)+'</td><td class="mono">'+(a.fail*100).toFixed(0)+'%</td><td class="mono"><b>'+a.quality.toFixed(2)+'</b></td></tr>'; }).join("");
+  var hero = DIMS.a4; var cmp = DIMS.a3;
+  function dims(d){
+    return DIM_NAMES.map(function(dn){ var v = d[dn[0]]; if(v===null) return '<div class="bar-row"><span>'+dn[1]+'</span><span class="note">N/A（无记忆能力）</span><span></span></div>';
+      return '<div class="bar-row"><span>'+dn[1]+'</span>'+bar(v)+'<span class="mono">'+v.toFixed(2)+'</span></div>'; }).join("");
+  }
+  return '<table><tr><th>候选资产</th><th>失败率</th><th>质量分</th></tr>'+rows+'</table>'+
+  '<h4 style="margin:14px 0 6px">主角资产「逐字稿整理员」的七维得分</h4><div class="grid2">'+
+    '<div>'+dims(hero)+'</div>'+
+    '<div style="font-size:12px;color:var(--ink-3)"><h4 style="color:var(--ink);font-size:13px;margin:0 0 6px">对照：头部「会议纪要大师」</h4>'+dims(cmp)+'</div>'+
+  '</div>'+
+  '<div class="note">注意：调用量最高的两个资产（全能办公助手、会议纪要大师），质量分被高失败率压低——质量分不为存量热度背书。</div>';
+}
+function s3(){
+  var s = state.scn; var on = matthewOn();
+  var ranked = rank(s.match, on?"new":"old");
+  var rows = ranked.map(function(r,i){
+    var a=r.a; var mul = qualityMul(a).toFixed(2);
+    if(on){ return '<tr><td>'+(i+1)+'</td><td><b>'+a.name+'</b> '+pill(a)+'</td><td class="mono">'+r.m.toFixed(2)+'</td><td class="mono">× '+mul+'</td><td class="mono">+ '+popMar(a).toFixed(2)+'×0.1</td><td class="mono"><b>'+r.s.toFixed(3)+'</b></td></tr>'; }
+    return '<tr><td>'+(i+1)+'</td><td><b>'+a.name+'</b> '+pill(a)+'</td><td class="mono">'+r.m.toFixed(2)+'×0.3</td><td class="mono">'+a.quality.toFixed(2)+'×0.15</td><td class="mono">'+popCum(a).toFixed(2)+'×0.55</td><td class="mono"><b>'+r.s.toFixed(3)+'</b></td></tr>';
+  }).join("");
+  var formula = on ? '最终得分 = 匹配度 × 质量乘数 + 边际热度 × 0.1' : '最终得分 = 匹配度 × 0.3 + 质量分 × 0.15 + 累计热度 × 0.55';
+  var head = on ? '<tr><th>#</th><th>资产</th><th>匹配度</th><th>质量乘数</th><th>边际热度</th><th>得分</th></tr>'
+                 : '<tr><th>#</th><th>资产</th><th>匹配项</th><th>质量项</th><th>热度项</th><th>得分</th></tr>';
+  return '<div class="quote">当前公式（'+(on?'新链路':'旧路径')+'）：<b>'+formula+'</b></div>'+
+  '<table>'+head+rows+'</table>'+
+  '<div class="note">'+(on
+    ? '新链路：匹配度占主导，热度只占 0.1 且是边际热度——它是「多数人选过」的弱证据。'
+    : '旧路径：热度占 0.55，头部资产的存量调用量直接主导排序——这正是马太的引擎。')+'</div>';
+}
+function s4(){
+  var s = state.scn;
+  var oldR = rank(s.match, "old");
+  var newR = rank(s.match, "new");
+  function tr(r, i, comp){
+    var a=r.a; var pos = comp.findIndex(function(x){return x.a.id===a.id;});
+    var delta = pos-i;
+    var arrow = delta===0?'<span class="note">—</span>':(delta>0?'<span class="down">↓'+delta+'</span>':'<span class="up">↑'+(-delta)+'</span>');
+    return '<tr><td>'+(i+1)+'</td><td><b>'+a.name+'</b> '+pill(a)+'</td><td class="mono">'+r.s.toFixed(3)+'</td><td>'+arrow+'</td></tr>';
+  }
+  var headAssets = ASSETS.filter(function(x){return x.head;});
+  var heatNote = headAssets.map(function(x){ return '「'+x.name+'」累计热度 '+popCum(x).toFixed(2)+' → 边际热度 '+popMar(x).toFixed(2); }).join('；');
+  return '<div class="grid2">'+
+    '<div><h4 style="margin:0 0 6px">旧路径（累计热度 0.55 主导）</h4><table><tr><th>#</th><th>资产</th><th>得分</th><th></th></tr>'+
+      oldR.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><b>'+r.a.name+'</b> '+pill(r.a)+'</td><td class="mono">'+r.s.toFixed(3)+'</td><td></td></tr>';}).join('')+'</table></div>'+
+    '<div><h4 style="margin:0 0 6px">新链路（边际热度）</h4><table><tr><th>#</th><th>资产</th><th>得分</th><th>vs 旧</th></tr>'+
+      newR.map(function(r,i){return tr(r,i,oldR);}).join('')+'</table></div>'+
+  '</div>'+
+  '<div class="quote" style="margin-top:12px"><b>抑制动作：</b>'+heatNote+'。头部资产存量巨大、边际增速慢；长尾资产起步快增、边际高。这就是「边际信息量递减」的落地。</div>'+
+  '<div class="note">'+(matthewOn()?'开关已开：右侧（新链路）为生效排序。':'开关已关：左侧（旧路径）为生效排序——头部资产凭存量热度占位。切换开关可看到命中结果反转。')+'</div>';
+}
+function s5(){
+  var s = state.scn; var on = matthewOn();
+  var ranked = rank(s.match, on?"new":"old");
+  var top = ranked[0]; var a = top.a;
+  var hitTags = a.tags.filter(function(t){return s.needTags.indexOf(t)>=0;});
+  var reason = '覆盖需求能力：'+hitTags.join(' / ')+'；近 30 天失败率 '+(a.fail*100).toFixed(0)+'%，用户评分 '+a.rating+'，质量分 '+a.quality.toFixed(2)+'。';
+
+  if(top.s >= 0.60){
+    var headWin = a.head;
+    return '<div class="winner">'+
+      '<div style="font-size:11px;color:var(--ok);font-weight:700;letter-spacing:.1em;margin-bottom:4px">命中 · 自动调用</div>'+
+      '<h3>'+a.name+' '+pill(a)+'</h3>'+
+      '<div style="font-size:12.5px;color:var(--ink-3)">创作者 '+a.creator+' · 累计调用 '+a.calls.toLocaleString()+' 次 · 发布 '+a.weeks+' 周</div>'+
+      '<div class="why">'+reason+'</div>'+
+      '<div style="margin-top:10px;font-size:13px;color:var(--ink-2)">用户看到的是任务完成的结果，以及一句归因——「本次由『'+a.name+'』完成」。他不需要知道资产库里有谁。</div>'+
+    '</div>'+
+    '<div class="note">'+(headWin
+      ? (on ? '✅ 头部资产凭真实匹配度取胜——抑制没有伤害它与需求真正契合的场景。'
+            : '头部资产在热度主导的旧路径下占据首位。切换开关到「新链路」，看排序是否一致。')
+      : '🎯 长尾需求被非头部资产命中：它累计调用仅 '+a.calls+' 次，在热度主导的旧路径中排不上来；新链路让它靠匹配度与质量取胜。')+'</div>';
+  }
+  var near = ranked[0].a;
+  return '<div class="panel-why">最高候选「'+near.name+'」得分 '+top.s.toFixed(2)+'，低于命中线 0.60——不硬推不合格资产，走失败路径。</div>'+
+    '<div class="fail-step"><b class="t">尝试 1 · 完整匹配</b><p>Top 候选未达命中线，不作为「推荐」展示。</p></div>'+
+    '<div class="fail-step"><b class="t">尝试 2 · 澄清引导</b><p>请求用户澄清约束（如「SEO 保障指保留 URL 结构，还是接受 301 重定向？」），重跑后仍无资产声明该能力。</p></div>'+
+    '<div class="fail-step"><b class="t">尝试 3 · 放宽阈值 + 标注差距</b><p>展示最接近方案「服务器迁移向导」，明确标注差距：支持迁移指引，但不覆盖搜索排名保障。</p></div>'+
+    '<div class="fail-step" style="border-left-color:var(--accent)"><b class="t">兜底 · 切回关键词检索</b><p>三次未命中后开放旧路径，不封死退路；本次需求写入「供给缺口」队列，反复出现则通知创作者运营组织供给。</p></div>';
+}
+
+var RENDERERS = [s0,s1,s2,s3,s4,s5];
+function render(){
+  var i = state.step; var m = STEP_META[i]; var cls = m.owner;
+  document.getElementById("panel").innerHTML =
+    '<div class="panel-head"><h2>STEP '+(i+1)+' · '+m.t+'</h2><span class="owner '+cls+'">'+m.ownerText+'</span></div>'+
+    '<div class="panel-why">'+m.why+'</div>'+
+    (state.scn ? RENDERERS[i]() : '<div class="note">请先选一个场景或输入需求，点「运行匹配」。</div>');
+}
+
+function renderLib(){
+  document.getElementById("libBody").innerHTML =
+    '<table style="margin-top:12px"><tr><th>资产</th><th>创作者</th><th>累计调用</th><th>近30天增量</th><th>评分</th><th>失败率</th><th>质量分</th></tr>'+
+    ASSETS.map(function(a){ return '<tr><td><b>'+a.name+'</b> '+pill(a)+'</td><td>'+a.creator+'</td><td class="mono">'+a.calls.toLocaleString()+'</td><td class="mono">'+a.calls30+'</td><td class="mono">'+a.rating+'</td><td class="mono">'+(a.fail*100).toFixed(0)+'%</td><td class="mono"><b>'+a.quality.toFixed(2)+'</b></td></tr>'; }).join('')+
+    '</table><div class="note">边际热度 = 近30天增量 / 累计调用，头部低、长尾高。质量分 = 七维加权，调用量不进质量分。</div>';
+}
+
+/* ================= 初始化 ================= */
+renderScn(); renderSwitch(); renderSteps(); render(); updateNav(); renderLib();
+setScn(SCENARIOS[0], false);
+</script>
+</body>
+</html>

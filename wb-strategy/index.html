@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkBuddy Agent资产生态策略 · 章鱼（Octopus Way）</title>
+<style>
+  :root{--ink:#1c1e21;--ink2:#4b5057;--ink3:#8a9099;--paper:#fafaf7;--card:#fff;--line:#e6e4de;--accent:#1f5eff;--accent-soft:#eef3ff;--ok:#0e7a4d;--ok-soft:#e9f6ef;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .page{max-width:960px;margin:0 auto;padding:80px 32px 48px;}
+  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;}
+  h1{font-size:clamp(30px,5vw,44px);font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .sub{font-size:16.5px;color:var(--ink2);max-width:660px;margin-bottom:20px;}
+  .thesis{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:20px 24px;margin:28px 0 40px;font-size:15px;color:#2a3550;}
+  .thesis b{font-weight:700;}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;}
+  @media(max-width:720px){.cards{grid-template-columns:1fr;}}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;transition:.18s;}
+  a.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,94,255,.08);}
+  a.card.hero{grid-column:1 / -1;background:linear-gradient(135deg,#eef3ff 0%,#fff 60%);}
+  .card .num{font-size:11px;letter-spacing:.18em;color:var(--accent);font-weight:700;margin-bottom:8px;}
+  .card h2{font-size:19px;font-weight:700;margin-bottom:8px;line-height:1.5;}
+  .card p{font-size:14px;color:var(--ink2);margin-bottom:10px;}
+  .card .go{font-size:13px;color:var(--accent);font-weight:650;}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:36px;font-size:13.5px;color:var(--ink2);}
+  .flow .node{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 15px;}
+  .flow .arrow{color:var(--ink3);}
+  .flow .node.bonus{border-color:var(--ok);color:var(--ok);background:var(--ok-soft);}
+  .footer{border-top:1px solid var(--line);padding:24px 0 8px;font-size:13.5px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .footer b{color:var(--ink2);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="kicker">WorkBuddy · Agent Ecosystem Strategy</div>
+    <h1>Agent资产生态策略</h1>
+    <p class="sub">让用户用一句自然语言需求，命中最合适的那一个 Agent——并让生态里每一份优质资产，无论头部还是长尾，都有被命中的通道。</p>
+  </header>
+
+  <div class="thesis">
+    <b>问题的一句话还原：</b>分发系统把「被用过很多次」当成了「值得被用」，于是头部资产反复获得曝光、长尾资产即使能力达标也难以触达；用户则在三次匹配不中后退回关键词检索。<b>这套策略的动作：</b>把「量」从质量判断中剥离（01），把「匹配」还给语义链路（02），把「生态分布健康」写进指标并全程可回滚（03），再用一个可交互原型演示长尾需求被非头部资产命中的完整过程（04）。
+  </div>
+
+  <div class="cards">
+    <a class="card" href="01-agent-asset-quality-framework.html">
+      <div class="num">DELIVERABLE 01</div>
+      <h2>Agent资产质量评估框架</h2>
+      <p>回答「一份资产是否值得继续被分发」：产品定位、七维评估体系、三层评测方式（在线评测/合成任务/人工终审）、平台可采信的五条依据。</p>
+      <span class="go">阅读 →</span>
+    </a>
+    <a class="card" href="02-demand-to-distribution-pipeline.html">
+      <div class="num">DELIVERABLE 02</div>
+      <h2>用户需求到Agent分发链路设计</h2>
+      <p>七阶段链路，每步明确规则/模型/人的判断归属及理由；失败路径；加分项——马太效应抑制策略（判定信号、手段、起作用信号、副作用控制）。</p>
+      <span class="go">阅读 →</span>
+    </a>
+    <a class="card" href="03-metrics-and-calibration.html">
+      <div class="num">DELIVERABLE 03</div>
+      <h2>效果指标与口径切换方案</h2>
+      <p>北极星「需求-资产匹配有效率」；稀疏期（Wilson 下界、30 天窗口、shadow）与稳态期（原始值、7 天窗口、公开）的口径切换触发条件与流程。</p>
+      <span class="go">阅读 →</span>
+    </a>
+    <a class="card hero" href="prototype.html">
+      <div class="num">DELIVERABLE 04 · INTERACTIVE</div>
+      <h2>可交互原型 · 长尾需求被非头部资产命中</h2>
+      <p>输入需求，逐步演示「需求理解 → 召回 → 质量评估 → 精排 → 马太抑制 → 自动调用」。切换「新链路/旧路径」开关，同一条长尾需求的命中结果在长尾与头部资产之间反转。全部数据为模拟数据。</p>
+      <span class="go">打开演示 →</span>
+    </a>
+  </div>
+
+  <div class="flow">
+    <span class="node">质量分（01）</span><span class="arrow">→</span>
+    <span class="node">分发链路（02）</span><span class="arrow">→</span>
+    <span class="node bonus">马太抑制（02 加分项）</span><span class="arrow">→</span>
+    <span class="node">指标与口径（03）</span><span class="arrow">→</span>
+    <span class="node">原型验证（04）</span>
+  </div>
+
+  <footer class="footer">
+    <span>作者 <b>章鱼（Octopus Way）</b> · 联系 <b>octopus4takoyaki@outlook.com</b></span>
+    <span>2026 年 9 月 · WorkBuddy 产培实战</span>
+  </footer>
+</div>
+</body>
+</html>

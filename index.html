@@ -312,23 +312,19 @@
         line-height: 1.6;
       }
       .thesis-right {
-        display: flex;
-        flex-direction: column;
-        gap: 1.3rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
       }
       .thesis-right .card {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 1.2rem;
-        padding: 1.5rem 1.5rem;
+        gap: 0.55rem;
+        padding: 1.15rem 1.3rem;
       }
       .thesis-right .card-title {
-        flex: 0 0 auto;
-        min-width: 5.2em;
-        font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+        font-size: clamp(1rem, 1.25vw, 1.15rem);
       }
       .thesis-right .card-desc {
-        font-size: clamp(0.9rem, 1.05vw, 1rem);
+        font-size: clamp(0.85rem, 1vw, 0.95rem);
       }
 
       /* ╔══════════════════════════════════════════════════════════════════════╗
@@ -417,9 +413,8 @@
           grid-template-columns: 1fr;
           gap: 1.2rem;
         }
-        .thesis-right .card {
-          flex-direction: column;
-          gap: 0.9rem;
+        .thesis-right {
+          grid-template-columns: 1fr;
         }
         #nav-dots { display: none; }
       }
@@ -438,6 +433,7 @@
         <span class="tag">产品 0-1</span>
         <span class="tag">方法论封装</span>
         <span class="tag">Skill 设计</span>
+        <span class="tag">生态策略</span>
       </div>
     </section>
 
@@ -475,11 +471,26 @@
             <div class="card-title">Beyond JD</div>
             <div class="card-desc">把求职场景转化为浏览器端工具</div>
           </div>
+          <div class="card">
+            <span class="rule"></span>
+            <div class="card-title">Agent 生态策略</div>
+            <div class="card-desc">把平台分发问题拆成可回滚的策略交付</div>
+          </div>
+          <div class="card">
+            <span class="rule"></span>
+            <div class="card-title">视觉词典</div>
+            <div class="card-desc">把 80 条视觉知识编排成顾问模式 Skill</div>
+          </div>
+          <div class="card">
+            <span class="rule"></span>
+            <div class="card-title">FDE 交付</div>
+            <div class="card-desc">把企业一线需求拆解成可落地方案</div>
+          </div>
         </div>
       </div>
       <footer class="section-foot">
         <span class="label">章鱼（Octopus Way）· Portfolio</span>
-        <span class="label">产品 · 方法论 · 系统化 · 交互工具</span>
+        <span class="label">产品 · 方法论 · 策略 · 交付</span>
       </footer>
     </section>
 
@@ -642,9 +653,121 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!--  SECTION 7 · END / 联系                                               -->
+    <!--  SECTION 7 · WB产培实战 · Agent 资产生态策略                          -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <section class="section section--end" data-section="7">
+    <section class="section" data-section="7">
+      <header class="section-chrome">
+        <span class="label">Ecosystem Strategy</span>
+        <span class="label">07</span>
+      </header>
+      <div class="project-head">
+        <span class="kicker">WorkBuddy 产培实战 · Agent 资产生态策略</span>
+        <h2 class="section-title">让一句自然语言需求<br />命中最合适的那一个 Agent</h2>
+      </div>
+      <div class="card-row">
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">质量评估框架</div>
+          <div class="card-desc">七维评估体系 + 三层评测（在线评测 / 合成任务 / 人工终审），把「被用过很多次」和「值得被用」分开判断</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">分发链路设计</div>
+          <div class="card-desc">七阶段链路逐层明确规则 / 模型 / 人的判断归属，附马太效应抑制策略与失败路径设计</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">指标与口径切换</div>
+          <div class="card-desc">北极星「需求-资产匹配有效率」，稀疏期与稳态期的口径切换条件、流程与全程回滚方案</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <a href="https://octopus4takoyaki.github.io/Octopus_Portfolio/wb-strategy/prototype.html" class="btn btn--primary" target="_blank">打开交互原型</a>
+        <a href="https://octopus4takoyaki.github.io/Octopus_Portfolio/wb-strategy/" class="btn" target="_blank">查看策略全文</a>
+      </div>
+      <footer class="section-foot">
+        <span class="label">章鱼（Octopus Way）· Portfolio</span>
+        <span class="label">质量 · 分发 · 指标 · 可交互原型</span>
+      </footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!--  SECTION 8 · Vibe Coding 视觉词典 Skill                               -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <section class="section" data-section="8">
+      <header class="section-chrome">
+        <span class="label">Knowledge Curation</span>
+        <span class="label">08</span>
+      </header>
+      <div class="project-head">
+        <span class="kicker">Vibe Coding 视觉词典 Skill</span>
+        <h2 class="section-title">用户说出任务<br />AI 通读词典给成套视觉方案</h2>
+      </div>
+      <div class="card-row">
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">80 词条知识底座</div>
+          <div class="card-desc">布局 / 导航 / 组件 / 滚动 / 视觉风格全量保真整理，每个词条附可直接复制的提示词</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">顾问模式入口</div>
+          <div class="card-desc">用户不再自己翻词条：说出任务，AI 按任务模板匹配，直接推荐 2–3 套完整视觉方案</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">方案组装器</div>
+          <div class="card-desc">任务模板映射 + 方案卡模板，把词条按风格 / 布局 / 组件 / 动效组合成可交付方案</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <a href="https://octopus4takoyaki.github.io/Octopus_Portfolio/visual-dictionary/" class="btn btn--primary" target="_blank">查看速查手册</a>
+      </div>
+      <footer class="section-foot">
+        <span class="label">章鱼（Octopus Way）· Portfolio</span>
+        <span class="label">80 词条 · 顾问模式 · 方案组装器</span>
+      </footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!--  SECTION 9 · FDE 内测 · 企业需求拆解                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <section class="section" data-section="9">
+      <header class="section-chrome">
+        <span class="label">Enterprise Delivery</span>
+        <span class="label">09</span>
+      </header>
+      <div class="project-head">
+        <span class="kicker">FDE 内测 · 企业需求拆解</span>
+        <h2 class="section-title">把模糊的企业一线需求<br />拆成 Agent 能执行的方案</h2>
+      </div>
+      <div class="card-row">
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">三份需求拆解文档</div>
+          <div class="card-desc">CRM 运维问答与人工升级、模糊报障转标准运维工单、知识库变更影响分析与更新清单</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">Skill 发布与验证</div>
+          <div class="card-desc">incident-to-ticket 技能发布落库，30 个样例端到端回归全部通过</div>
+        </div>
+        <div class="card">
+          <span class="rule"></span>
+          <div class="card-title">沙箱环境排障</div>
+          <div class="card-desc">定位 PowerShell 5.1 兜底 + 受限语言模式的根因链，产出一键部署脚本，全程可回滚</div>
+        </div>
+      </div>
+      <footer class="section-foot">
+        <span class="label">章鱼（Octopus Way）· Portfolio</span>
+        <span class="label">需求拆解 · Skill 发布 · 环境部署 · 内测交付</span>
+      </footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!--  SECTION 10 · END / 联系                                              -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <section class="section section--end" data-section="10">
       <div class="cover-name">章鱼（Octopus Way）</div>
       <h2 class="cover-title" style="font-size: clamp(2rem, 6vw, 5rem)">Always on the road</h2>
       <p class="cover-subtitle">Aspiring to be an AI Builder</p>

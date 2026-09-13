@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent资产质量评估框架 · 章鱼（Octopus Way）</title>
+<style>
+  :root{--ink:#1c1e21;--ink2:#4b5057;--ink3:#8a9099;--paper:#fafaf7;--card:#fff;--line:#e6e4de;--accent:#1f5eff;--accent-soft:#eef3ff;--warn:#b4540a;--warn-soft:#fdf3e7;--ok:#0e7a4d;--ok-soft:#e9f6ef;--code:#f4f3ef;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.85;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .page{max-width:880px;margin:0 auto;padding:64px 32px 40px;}
+  .cover{margin-bottom:56px;}
+  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;}
+  h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .sub{font-size:16.5px;color:var(--ink2);max-width:640px;margin-bottom:28px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13px;color:var(--ink3);border-top:1px solid var(--line);padding-top:16px;}
+  .meta b{color:var(--ink2);font-weight:600;}
+  section{margin-bottom:56px;}
+  .sec-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h2{font-size:25px;font-weight:700;line-height:1.5;margin-bottom:18px;}
+  h3{font-size:18px;font-weight:650;margin:30px 0 12px;}
+  p{margin-bottom:13px;color:var(--ink2);}
+  p strong,li strong{color:var(--ink);font-weight:650;}
+  ul,ol{padding-left:22px;margin-bottom:13px;color:var(--ink2);}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:3px solid var(--accent);padding:16px 20px;border-radius:0 10px 10px 0;margin:18px 0;font-size:15px;color:#2a3550;}
+  .callout b{font-weight:650;}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;background:var(--card);}
+  th{text-align:left;font-weight:650;color:var(--ink);font-size:13px;border-bottom:2px solid var(--ink);padding:9px 12px;white-space:nowrap;}
+  td{border-bottom:1px solid var(--line);padding:10px 12px;vertical-align:top;color:var(--ink2);}
+  tr:last-child td{border-bottom:none;}
+  .formula{font-family:Consolas,"Courier New",monospace;font-size:14px;background:var(--code);border-radius:9px;padding:14px 18px;margin:12px 0;overflow-x:auto;color:#2a2a2a;line-height:1.9;}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:56px;}
+  .toc h3{margin:0 0 10px;font-size:14px;color:var(--ink3);font-weight:600;letter-spacing:.1em;}
+  .toc ol{margin:0;padding-left:20px;font-size:14px;}
+  .toc a{color:var(--ink2);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  .footer{border-top:1px solid var(--line);margin-top:28px;padding:22px 0 8px;font-size:13px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  @media print{body{background:#fff;}.page{padding:20px 0;}.toc{display:none;}section{page-break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="cover">
+    <div class="kicker">Agent Ecosystem Strategy · 01</div>
+    <h1>Agent资产质量评估框架</h1>
+    <p class="sub">回答一个问题：平台凭什么判断「一份资产是否值得继续被分发」，以及平台凭什么相信这个判断本身。</p>
+    <div class="meta">
+      <span>作者 <b>章鱼（Octopus Way）</b></span>
+      <span>联系 <b>octopus4takoyaki@outlook.com</b></span>
+      <span>日期 <b>2026 年 9 月</b></span>
+      <span>场景 <b>WorkBuddy 产培实战</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#s0">方法论总纲：观测不等于真相</a></li>
+      <li><a href="#s1">一个前提：资产质量不等于分发表现</a></li>
+      <li><a href="#s2">产品定位</a></li>
+      <li><a href="#s3">行业已有做法</a></li>
+      <li><a href="#s4">评估对象与七个维度</a></li>
+      <li><a href="#s5">评估方法与流水线</a></li>
+      <li><a href="#s6">质量如何支撑分发决策</a></li>
+      <li><a href="#s7">冷启动与置信</a></li>
+      <li><a href="#s8">平台是否可采信该框架</a></li>
+      <li><a href="#s9">评测如何落地</a></li>
+    </ol>
+  </nav>
+
+  <section id="s0">
+    <div class="sec-kicker">Method · Premise</div>
+    <h2>方法论总纲：观测不等于真相</h2>
+    <p>本框架及配套文档（02 分发链路、03 指标方案）共享一个前提：<strong>观测到的数据，不等于我们想知道的真相，中间隔着偏差和噪声。</strong></p>
+    <ul>
+      <li><strong>偏差</strong>：系统性扭曲。曝光多的资产数据多、位置好的资产点击多、小样本比率虚高。</li>
+      <li><strong>噪声</strong>：随机波动。样本少波动大。</li>
+    </ul>
+    <p>在这个前提下，框架里任何一个指标或操作，都回答四个子问题之一：</p>
+    <table>
+      <tr><th>子问题</th><th>朴素问法</th><th>在本框架的落点</th></tr>
+      <tr><td><b>效度</b></td><td>量的对不对</td><td>区分「资产质量」和「分发表现」；调用量不进质量分</td></tr>
+      <tr><td><b>信度</b></td><td>量的稳不稳</td><td>在线比率取 Wilson 置信下界</td></tr>
+      <tr><td><b>因果</b></td><td>关系真不真</td><td>影子期对账「质量分与在线完成率」的相关性</td></tr>
+      <tr><td><b>估计</b></td><td>参数怎么来</td><td>维度权重、质量乘数在影子期标定</td></tr>
+    </table>
+    <p>这样，框架里每一个数字（质量分、乘数、权重）都有处可归，不是空降。</p>
+  </section>
+
+  <section id="s1">
+    <div class="sec-kicker">Premise</div>
+    <h2>一个前提：资产质量不等于分发表现</h2>
+    <table>
+      <tr><th></th><th>Agent 资产质量</th><th>分发表现</th></tr>
+      <tr><td><b>回答的问题</b></td><td>这个 Agent 本身好不好、可不可靠、安不安全</td><td>这个 Agent 分发后被选用、被完成得怎么样</td></tr>
+      <tr><td><b>评估对象</b></td><td>Agent 的能力与行为（任务执行轨迹）</td><td>Agent 进入分发后的统计结果</td></tr>
+      <tr><td><b>是否依赖分发环境</b></td><td>不依赖，可离线评估</td><td>依赖，只能在线观测</td></tr>
+      <tr><td><b>典型信号</b></td><td>任务完成率、工具调用正确率、推理质量、鲁棒性、安全合规</td><td>调用量、失败率、退出原因、曝光转化率、token 消耗</td></tr>
+    </table>
+    <p>两者的关系：<strong>资产质量是分发的前提；分发表现是资产质量在真实流量里的投影，用于校准和触发重评，本身不是质量。</strong></p>
+    <p>一句话：先回答「它值不值得被分发」，再回答「它分发后表现如何」。前者是后者的基础。</p>
+  </section>
+
+  <section id="s2">
+    <div class="sec-kicker">Positioning</div>
+    <h2>产品定位</h2>
+    <h3>一句话定位</h3>
+    <p>这是 Agent 资产生态里的<strong>「质量准入与续用判断层」</strong>：在资产进入分发之前，判断它本身是否达标；在分发持续期间，判断它是否还值得继续被分发。它不负责「把谁排第一」，只负责「谁有资格被排」。</p>
+    <h3>解决什么问题</h3>
+    <p>平台现状有两个问题：用户以关键词检索为主，能搜到的不一定匹配；头部资产反复被分发，长尾资产能力达标也难触达。两者的根因是同一个：平台没有「资产本身好不好」的独立标准，只能用「被用得多不多」当代理。而调用量反映的是历史曝光的累积，不等于质量。本框架补的就是这个缺。</p>
+    <h3>框架回答三个问题</h3>
+    <ol>
+      <li><strong>能不能进</strong>：资产质量是否达到准入门槛（能力达标 + 安全合规硬门槛）。</li>
+      <li><strong>值不值得继续分发</strong>：质量分作为分发排序里的质量项，以及在线哨兵是否触发重评。</li>
+      <li><strong>该不该退出</strong>：重评后质量分是否跌破退出线，而不是「失败率高就下架」。</li>
+    </ol>
+    <h3>服务谁</h3>
+    <table>
+      <tr><th>使用方</th><th>拿到什么</th><th>用途</th></tr>
+      <tr><td>分发链路</td><td>质量分</td><td>准入门槛 + 排序里的质量项</td></tr>
+      <tr><td>创作者</td><td>质量归因（为什么是这个分）</td><td>迭代改进的依据</td></tr>
+      <tr><td>平台运营</td><td>治理依据、供给缺口信号</td><td>生态治理</td></tr>
+    </table>
+    <h3>边界：不做什么</h3>
+    <ul>
+      <li>不做排序。排序由分发链路做，框架只提供质量输入。</li>
+      <li>不做匹配判断。「合不合」是分发链路的事，框架只判「好不好」。</li>
+      <li>不做创作者评价。评估的是资产，不是人。</li>
+      <li>不面向终端用户展示。不变成界面上的「官方评分」。</li>
+    </ul>
+  </section>
+
+  <section id="s3">
+    <div class="sec-kicker">Industry Basis</div>
+    <h2>行业已有做法</h2>
+    <p>Agent 质量评估在 2024–2026 年已形成方法论共识。本框架做的是「适配 + 裁剪」，不是发明。</p>
+    <h3>三条共识</h3>
+    <p><strong>共识一：评估对象是执行轨迹，不是最终答案。</strong>Agent 的一次运行是「输入 → 推理 → 工具调用 → 观察 → 输出」的多步轨迹。只看最终答案会漏掉多数问题：工具选错、参数传错、循环重试、推理链断裂，这些都不出现在最终文本里。Langfuse 把 Agent 质量拆成四维：轨迹、工具使用、任务完成、多轮质量。</p>
+    <p><strong>共识二：评估方法分三层，是层不是替代。</strong>确定性代码检查（可判定的事，毫秒级）；LLM-as-judge（语义判断，需人工标注校准）；人工标注（建立真值、校准 judge）。</p>
+    <p><strong>共识三：离线评估和在线观测回答不同问题，缺一不可。</strong>离线评估在发布前跑，抓回归；在线观测持续跑，抓漂移和长尾。</p>
+    <h3>主要参考来源</h3>
+    <table>
+      <tr><th>来源</th><th>核心贡献</th><th>本框架的取用</th></tr>
+      <tr><td>AWS《Agent 质量评估》</td><td>四步评估流程；业务/效率/安全三组指标；LLM-as-judge</td><td>流水线结构、指标分层、judge 规范</td></tr>
+      <tr><td>Langfuse</td><td>质量四维：轨迹 / 工具 / 任务完成 / 多轮</td><td>维度骨架</td></tr>
+      <tr><td>τ-bench</td><td>任务成功率 pass¹、稳定性 passᵏ、规则合规率</td><td>Q1 指标</td></tr>
+      <tr><td>AgentBoard</td><td>成功率 / 进度率 / 落地准确率</td><td>Q3、Q6 指标</td></tr>
+      <tr><td>AgentBench</td><td>8 环境泛化评测</td><td>跨场景泛化能力</td></tr>
+      <tr><td>superteams</td><td>四支柱：结果 / 推理规划 / 工具 / 可靠安全</td><td>维度分层</td></tr>
+      <tr><td>Ragas / DeepEval / LangSmith</td><td>忠实度、相关性等指标；轨迹评测工具</td><td>Q2、Q5 方法</td></tr>
+      <tr><td>Algolia</td><td>推理、工具、检索、性能、记忆、安全全维清单</td><td>维度完整性核对</td></tr>
+    </table>
+    <p style="font-size:13px;color:var(--ink3)">完整链接见文末「参考来源」。</p>
+  </section>
+
+  <section id="s4">
+    <div class="sec-kicker">Evaluation System</div>
+    <h2>评估对象与七个维度</h2>
+    <h3>评估对象</h3>
+    <p>本框架的评估单位是：<strong>给定一个任务，Agent 的一次执行轨迹</strong>（输入 → 推理 → 工具调用 → 观察 → 输出）。失败率、退出原因不是质量本身，因为它们把大量轨迹粗粒度聚合，丢掉了轨迹内部的信息。一个失败率 40% 的 Agent，失败可能是「工具选错」（可修），也可能是「推理链断裂」（难修）——只有打开轨迹才能判断。</p>
+    <p>对应 WorkBuddy：Agent 的「工具」就是它调用的 Skill / Plugin / MCP / 工作流，「轨迹」就是它执行任务时的调用序列和中间状态。平台已有对话日志和工作流编排能力，轨迹采集有现实基础。</p>
+    <h3>七个评估维度</h3>
+    <table>
+      <tr><th>维度</th><th>回答的问题</th><th>核心指标</th><th>评估方法</th></tr>
+      <tr><td><b>Q1 任务完成</b></td><td>目标达成了吗</td><td>任务成功率、稳定性 passᵏ、进度率</td><td>有真值用确定性比对；无真值用 LLM-as-judge</td></tr>
+      <tr><td><b>Q2 推理与规划</b></td><td>想得对不对、计划守不守得住</td><td>计划质量、计划遵循度</td><td>LLM-as-judge 为主，人工抽检校准</td></tr>
+      <tr><td><b>Q3 工具/技能调用</b></td><td>用对工具了吗</td><td>工具选择准确率、参数正确率、冗余调用率</td><td>确定性检查（工具名、参数 schema）</td></tr>
+      <tr><td><b>Q4 轨迹效率</b></td><td>路径高效吗</td><td>步数 vs 最少步数、循环率、token/任务、时延 p50/p95</td><td>确定性检查</td></tr>
+      <tr><td><b>Q5 记忆与多轮</b></td><td>跨轮记得住吗</td><td>上下文保持、目标漂移、会话解决轮数</td><td>LLM-as-judge；无记忆类记 N/A</td></tr>
+      <tr><td><b>Q6 鲁棒与恢复</b></td><td>出错能自愈吗</td><td>错误恢复率、扰动稳定性、故障注入降级表现</td><td>确定性（故障注入）+ 人工评审</td></tr>
+      <tr><td><b>Q7 安全与合规</b></td><td>干不该干的了吗</td><td>注入/越权抵抗、敏感数据泄露率、政策合规率</td><td>确定性（红队用例）+ 人工终审</td></tr>
+    </table>
+    <div class="callout"><b>取舍：</b>七维不要求每个资产跑满。权重不公开精确数值（防针对优化），核心权重压在 Q1/Q3/Q6/Q7 这几个难以用行为数量操纵的维度上。</div>
+  </section>
+
+  <section id="s5">
+    <div class="sec-kicker">Method & Pipeline</div>
+    <h2>评估方法与流水线</h2>
+    <h3>三层方法</h3>
+    <table>
+      <tr><th>层</th><th>适用</th><th>成本/时延</th><th>示例</th></tr>
+      <tr><td>确定性代码检查</td><td>可判定的事</td><td>毫秒级、近零成本</td><td>工具是否调用、参数是否过 schema、步数是否超预算</td></tr>
+      <tr><td>LLM-as-judge</td><td>语义判断</td><td>模型成本、秒级</td><td>计划是否合理、推理是否连贯、答案是否切题</td></tr>
+      <tr><td>人工标注</td><td>真值与校准</td><td>专家时间、天级</td><td>建立真值、校准 judge、裁决歧义或安全关键轨迹</td></tr>
+    </table>
+    <p>分工：代码检查跑在每条轨迹上；judge 跑在需要语义判断的子集上；人工处理分歧和低置信度样本，并反向校准 judge。</p>
+    <h3>评估流水线</h3>
+    <ol>
+      <li><strong>测试集构建</strong>：优先从真实业务数据挖掘；冷启动用人工示例 + self-instruct 生成。覆盖常规、边界、对抗三类场景。</li>
+      <li><strong>执行</strong>：在沙箱中运行 Agent，采集完整轨迹。</li>
+      <li><strong>打分</strong>：按七维 + 三层方法计算分维度得分。</li>
+      <li><strong>归因分析</strong>：对失败用例归因（工具选错 / 参数错 / 推理断 / 安全违规），定位瓶颈。</li>
+      <li><strong>迭代</strong>：修正后重跑，形成「评估 → 优化 → 再评估」闭环。</li>
+    </ol>
+    <p style="font-size:13px;color:var(--ink3)">约束：测试集质量决定评估结论的上限。评估资产质量，本质是评估「Agent × 测试集」这个组合。</p>
+  </section>
+
+  <section id="s6">
+    <div class="sec-kicker">Into Distribution</div>
+    <h2>质量如何支撑分发决策</h2>
+    <h3>准入：质量是门槛</h3>
+    <p>资产先通过质量评估（Q1 达标 + Q7 硬门槛），才获得分发资格。评测方式按资产状态分三种，都用平台已有资源：</p>
+    <table>
+      <tr><th>资产状态</th><th>评测方式</th><th>真值来源</th></tr>
+      <tr><td>已有流量</td><td>在线评测（对话日志挖矿）</td><td>用户行为：满意/重试/换资产/退出</td></tr>
+      <tr><td>新资产/长尾</td><td>合成任务评测</td><td>模型自动生成任务 + LLM-as-judge</td></tr>
+      <tr><td>安全/关键场景</td><td>人工标注终审</td><td>人工构造真值</td></tr>
+    </table>
+    <h3>质量分：分发排序里的质量项</h3>
+    <p>七维合成一个质量分（带分维度归因），在精排里作为匹配度的乘数：</p>
+    <div class="formula">最终得分 = 匹配度 × 质量乘数 + 边际热度 × 小权重</div>
+    <ul>
+      <li>匹配度回答「合不合」，占主导。</li>
+      <li>质量乘数回答「好不好」，初始 0.8–1.2，影子期标定。</li>
+      <li>新资产质量分置信度低时，乘数收敛到 1，先靠匹配度被选中。</li>
+      <li>长期由 learning-to-rank 学权重，人工乘数退位。</li>
+    </ul>
+    <h3>在线观测：哨兵与校准</h3>
+    <p>任务书给的元数据（调用量、失败率、退出原因、token、评分、转化率）不是质量，是在线哨兵信号：失败率、token 等异常时触发重评（重跑离线测试集），而不是直接改质量分；在线结果（复用率、任务完成）与离线质量分对账，校准评估和 judge。</p>
+    <h3>退出：重评驱动</h3>
+    <table>
+      <tr><th>级别</th><th>触发条件</th><th>动作</th></tr>
+      <tr><td>降权</td><td>哨兵异常，重评后质量分跌破 0.45</td><td>质量项压至下限，保留曝光</td></tr>
+      <tr><td>暂停分发</td><td>重评后质量分跌破 0.30，或安全重评不通过</td><td>撤出主动曝光，保留资产页</td></tr>
+      <tr><td>下架</td><td>安全硬违规（立即）；或暂停满 90 天且创作者无修复</td><td>移出资产目录</td></tr>
+    </table>
+  </section>
+
+  <section id="s7">
+    <div class="sec-kicker">Cold Start</div>
+    <h2>冷启动与置信</h2>
+    <ol>
+      <li><strong>准入不依赖调用量</strong>：新资产通过质量评估（测试集达标）即可准入。调用量从来不是质量的组成部分。</li>
+      <li><strong>在线比率取置信下界</strong>：失败率、转化率等在线比率用 Wilson 置信下界，小样本向保守收缩，既不被早期差评钉死，也不因小样本高分被过推。</li>
+      <li><strong>观察池</strong>：新资产进入观察池，获得保底探索流量（占分发总量 2%–5%），积累在线信号，样本充足后转正式池。</li>
+    </ol>
+  </section>
+
+  <section id="s8">
+    <div class="sec-kicker">Trustworthiness</div>
+    <h2>平台是否可采信该框架</h2>
+    <p>评估框架最大的风险不是「不准」，而是「不准但没人发现」。平台采信该框架，需要五条判断依据同时成立：</p>
+    <table>
+      <tr><th>判断依据</th><th>校验动作</th></tr>
+      <tr><td>可解释</td><td>质量分可归因到七维的具体得分和测试用例，创作者能核对「为什么是这个分」</td></tr>
+      <tr><td>抗操纵</td><td>调用量不进质量分；核心权重压在难以操纵的 Q1/Q3/Q6/Q7</td></tr>
+      <tr><td>冷启动公平</td><td>准入不依赖调用量；在线比率取 Wilson 下界</td></tr>
+      <tr><td>后验一致</td><td>影子期验证「离线质量分与在线完成率、复用率」的相关性，达标才上线</td></tr>
+      <tr><td>可回滚</td><td>质量分对分发的影响统一走「质量项」出口，逐日快照，异常可回退</td></tr>
+    </table>
+    <p>采信流程：影子期（只算不出声，对账后验一致性）→ 灰度期（10%–30% 流量、质量项封顶）→ 全量（护栏触发自动回滚）。五条中任何一条被证伪，框架都不应被采信上线。</p>
+  </section>
+
+  <section id="s9">
+    <div class="sec-kicker">Cost</div>
+    <h2>评测如何落地，成本在哪</h2>
+    <p>任务书给的可用元数据（名称、描述、调用量、评分、token 消耗、失败率、退出原因）几乎全是分发观测，没有一项能直接支撑资产质量评估。这是本框架和「拿现成分发数据凑质量分」的关键区别。</p>
+    <p>但资产质量评估不一定要靠长时间人工离线评测。三种评测方式覆盖全部资产，且都用平台已有资源：</p>
+    <table>
+      <tr><th>评测方式</th><th>靠什么</th><th>人工成本</th></tr>
+      <tr><td>在线评测</td><td>对话日志 + 需求理解层结果 + LLM-as-judge</td><td>低</td></tr>
+      <tr><td>合成任务评测</td><td>通用大模型生成任务（self-instruct）+ 工作流编排跑轨迹 + LLM-as-judge 打分</td><td>低</td></tr>
+      <tr><td>人工标注</td><td>安全/关键场景终审</td><td>高，仅少量场景</td></tr>
+    </table>
+    <p>真正的增量投入只有一项：合成任务评测的流水线（自动生成任务 → 沙箱执行 → 打分），用平台已有的通用大模型和工作流编排就能搭。</p>
+    <div class="callout"><b>边界：</b>合成任务评测是冷启动的起跑器，不是永久替代。合成任务是模型编的，编不出真实用户才会踩的边界 case；资产攒够真实流量后，应切到「对话日志挖矿」，那才是真值。</div>
+  </section>
+
+  <section>
+    <div class="sec-kicker">References</div>
+    <h2>参考来源</h2>
+    <ul>
+      <li>AWS《Agent 质量评估》：https://aws.amazon.com/cn/blogs/china/agent-quality-evaluation/</li>
+      <li>Langfuse《AI agent evaluation》：https://langfuse.com/resources/engineering/ai-agent-evaluation</li>
+      <li>superteams《Agent Evaluation》：https://www.superteams.ai/glossary/agent-evaluation</li>
+      <li>Algolia《AI agent evaluation: frameworks and metrics》：https://www.algolia.com/blog/ai/ai-agent-evaluation-frameworks-metrics-testing-strategies</li>
+      <li>τ-bench：https://github.com/sierra-research/tau-bench</li>
+      <li>Ragas：https://github.com/explodinggradients/ragas</li>
+      <li>DeepEval / LangSmith / OpenAI Evals（评测工具）</li>
+    </ul>
+  </section>
+
+  <footer class="footer">
+    <span>《Agent资产质量评估框架》· WorkBuddy 产培实战</span>
+    <span>章鱼（Octopus Way） · octopus4takoyaki@outlook.com · 2026-09</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>效果指标与口径切换方案 · 章鱼（Octopus Way）</title>
+<style>
+  :root{--ink:#1c1e21;--ink2:#4b5057;--ink3:#8a9099;--paper:#fafaf7;--card:#fff;--line:#e6e4de;--accent:#1f5eff;--accent-soft:#eef3ff;--warn:#b4540a;--warn-soft:#fdf3e7;--ok:#0e7a4d;--ok-soft:#e9f6ef;--code:#f4f3ef;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.85;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .page{max-width:880px;margin:0 auto;padding:64px 32px 40px;}
+  .cover{margin-bottom:56px;}
+  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;}
+  h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .sub{font-size:16.5px;color:var(--ink2);max-width:640px;margin-bottom:28px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13px;color:var(--ink3);border-top:1px solid var(--line);padding-top:16px;}
+  .meta b{color:var(--ink2);font-weight:600;}
+  section{margin-bottom:56px;}
+  .sec-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h2{font-size:25px;font-weight:700;line-height:1.5;margin-bottom:18px;}
+  h3{font-size:18px;font-weight:650;margin:30px 0 12px;}
+  p{margin-bottom:13px;color:var(--ink2);}
+  p strong,li strong{color:var(--ink);font-weight:650;}
+  ul,ol{padding-left:22px;margin-bottom:13px;color:var(--ink2);}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:3px solid var(--accent);padding:16px 20px;border-radius:0 10px 10px 0;margin:18px 0;font-size:15px;color:#2a3550;}
+  .callout b{font-weight:650;}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;background:var(--card);}
+  th{text-align:left;font-weight:650;color:var(--ink);font-size:13px;border-bottom:2px solid var(--ink);padding:9px 12px;white-space:nowrap;}
+  td{border-bottom:1px solid var(--line);padding:10px 12px;vertical-align:top;color:var(--ink2);}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;font-weight:600;}
+  .badge.sparse{background:var(--warn-soft);color:var(--warn);}
+  .badge.steady{background:var(--ok-soft);color:var(--ok);}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:56px;}
+  .toc h3{margin:0 0 10px;font-size:14px;color:var(--ink3);font-weight:600;letter-spacing:.1em;}
+  .toc ol{margin:0;padding-left:20px;font-size:14px;}
+  .toc a{color:var(--ink2);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  .footer{border-top:1px solid var(--line);margin-top:28px;padding:22px 0 8px;font-size:13px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  @media print{body{background:#fff;}.page{padding:20px 0;}.toc{display:none;}section{page-break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="cover">
+    <div class="kicker">Agent Ecosystem Strategy · 03</div>
+    <h1>效果指标与口径切换方案</h1>
+    <p class="sub">上线之后怎么知道这条路走对了——以及在新链路还缺数据的前几个月，如何既看清早期信号、又不被小样本的噪声骗着做决定。</p>
+    <div class="meta">
+      <span>作者 <b>章鱼（Octopus Way）</b></span>
+      <span>联系 <b>octopus4takoyaki@outlook.com</b></span>
+      <span>日期 <b>2026 年 9 月</b></span>
+      <span>场景 <b>WorkBuddy 产培实战</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#s1">方法论总纲</a></li>
+      <li><a href="#s2">指标分层</a></li>
+      <li><a href="#s3">北极星指标</a></li>
+      <li><a href="#s4">支撑与护栏指标</a></li>
+      <li><a href="#s5">稀疏期与稳态期的口径切换</a></li>
+      <li><a href="#s6">因果归因：A/B 对照</a></li>
+      <li><a href="#s7">指标防博弈</a></li>
+    </ol>
+  </nav>
+
+  <section id="s1">
+    <div class="sec-kicker">Method · Premise</div>
+    <h2>方法论总纲：观测不等于真相</h2>
+    <p>所有指标和口径切换，都建立在一个前提上：<strong>观测到的数据，不等于我们想知道的真相，中间隔着偏差和噪声。</strong></p>
+    <ul>
+      <li>偏差：数据被系统性扭曲（曝光多的资产数据多、位置好的资产点击多、小样本比率虚高）。</li>
+      <li>噪声：随机波动（样本少波动大）。</li>
+    </ul>
+    <p>任何一个指标或操作，都要回答四个子问题之一：</p>
+    <table>
+      <tr><th>子问题</th><th>朴素问法</th><th>在本文档里的落点</th></tr>
+      <tr><td><b>效度</b></td><td>量的对不对</td><td>北极星指标的定义是否真的测了「匹配好」</td></tr>
+      <tr><td><b>信度</b></td><td>量的稳不稳</td><td>稀疏期/稳态期的口径切换</td></tr>
+      <tr><td><b>因果</b></td><td>关系真不真</td><td>A/B 对照，排除大盘自然增长</td></tr>
+      <tr><td><b>估计</b></td><td>参数怎么来</td><td>口径里的阈值、窗口从哪来</td></tr>
+    </table>
+  </section>
+
+  <section id="s2">
+    <div class="sec-kicker">Layering</div>
+    <h2>指标分层</h2>
+    <p>不堆指标，分三层，各司其职：</p>
+    <table>
+      <tr><th>层</th><th>数量</th><th>作用</th></tr>
+      <tr><td>北极星</td><td>1 个</td><td>衡量成败</td></tr>
+      <tr><td>支撑指标</td><td>数个</td><td>解释北极星为什么涨跌</td></tr>
+      <tr><td>护栏指标</td><td>数个</td><td>只刹车，不报功</td></tr>
+    </table>
+  </section>
+
+  <section id="s3">
+    <div class="sec-kicker">North Star</div>
+    <h2>北极星指标</h2>
+    <p><strong>北极星指标（North Star Metric）</strong> 指最能代表「产品给用户的核心价值」的那一个指标。它只有一个，衡量用户价值而非商业收入，用于判断团队是否在往正确方向走。</p>
+    <div class="callout"><b>本方案的北极星：需求-资产匹配有效率。</b>定义：一个发起匹配的会话中，用户在三次内选用某个资产、且该次使用最终完成任务的比率。</div>
+    <p>为什么选它：同时抓「找得到」（选用）和「用得好」（完成）。只考核选用，会诱导夸大宣传把用户骗进来；加上完成条件，误选会在后验上把指标拉回来。</p>
+  </section>
+
+  <section id="s4">
+    <div class="sec-kicker">Support & Guardrail</div>
+    <h2>支撑指标与护栏指标</h2>
+    <h3>支撑指标</h3>
+    <table>
+      <tr><th>组</th><th>指标</th><th>定义</th></tr>
+      <tr><td rowspan="3">用户侧</td><td>三次内命中率</td><td>三次内发生「选用」的会话 / 发起匹配的会话</td></tr>
+      <tr><td>匹配放弃率</td><td>三次未命中、且未用兜底检索就离开的会话占比</td></tr>
+      <tr><td>二次筛选时长 P50</td><td>从展示结果到选用的中位耗时</td></tr>
+      <tr><td rowspan="3">生态侧</td><td>长尾命中率</td><td>被命中的资产中，非 Top 5% 资产的占比</td></tr>
+      <tr><td>曝光集中度</td><td>Top 5% 资产曝光份额，及其 7 日增速</td></tr>
+      <tr><td>新资产 14 天达标率</td><td>发布 14 天内调用 ≥ 100 的新资产占比（基线 8%）</td></tr>
+    </table>
+    <h3>护栏指标（只刹车，不报功）</h3>
+    <table>
+      <tr><th>指标</th><th>触发动作</th></tr>
+      <tr><td>用户满意度 / 负反馈率</td><td>跌破基线 2 个标准差，回退当日抑制与重排参数</td></tr>
+      <tr><td>头部任务完成率</td><td>下降超过 2pp，马太抑制幅度回退一档</td></tr>
+      <tr><td>兜底检索回流量</td><td>持续走高，说明新链路在透支信任而非建立信任</td></tr>
+    </table>
+  </section>
+
+  <section id="s5">
+    <div class="sec-kicker">Core · Calibration</div>
+    <h2>稀疏期与稳态期的口径切换</h2>
+    <h3>稀疏期的定义</h3>
+    <p>稀疏期 = <strong>在线观测指标的样本量未达阈值</strong>的阶段。为什么这样定义：在线观测（失败率、复用率、命中率）完全依赖流量，没流量就是没有，样本少时噪声大。而质量分不同——它现在能靠合成任务评测在无流量时得出（只是置信度低），所以质量分不受稀疏期限制，始终可用。</p>
+    <h3>「口径」指什么</h3>
+    <p>口径切换不是换指标，是换同一个指标「怎么算」。口径包含四样：</p>
+    <table>
+      <tr><th>口径要素</th><th><span class="badge sparse">稀疏期</span></th><th><span class="badge steady">稳态期</span></th></tr>
+      <tr><td>统计窗口</td><td>30 天滚动</td><td>7 天滚动</td></tr>
+      <tr><td>比率估计</td><td>Wilson 置信下界</td><td>原始值（n ≥ 100）；小样本仍用下界</td></tr>
+      <tr><td>决策粒度</td><td>类目 / 策略层</td><td>资产 × 需求簇层</td></tr>
+      <tr><td>榜单</td><td>创作者后台私有可见（shadow）</td><td>公开，附样本量与置信标注</td></tr>
+    </table>
+    <h3>为什么稀疏期要保守</h3>
+    <p>这是信度问题：小样本下，命中率从 40% 跳到 80% 可能只是噪声。保守口径等于承认「我还看不清」，不装懂。公开一个噪声大的榜单，回撤成本极高。</p>
+    <h3>切换触发条件（四条件同时满足）</h3>
+    <ol>
+      <li>资产 × 需求组合中，n ≥ 100 的组合覆盖 ≥ 80% 的匹配请求量。</li>
+      <li>北极星指标 4 个连续周的变异系数 < 10%。</li>
+      <li>影子期对账相关性达标，且灰度期护栏零触发满 2 周。</li>
+      <li>指标看板双口径并行展示 ≥ 4 周。</li>
+    </ol>
+    <h3>切换流程</h3>
+    <ol>
+      <li>双轨并行（切换前 4 周）：两套口径同时输出，以稀疏期口径决策、以稳态期口径对照。</li>
+      <li>正式切换：决策口径切至稳态期，稀疏期口径保留为「长窗口参考」视图。</li>
+      <li>回看校验（切换后 2 周）：用稀疏期长窗口数据回看切换时点的稳态期读数，验证无系统偏差。</li>
+      <li>分级下钻：先类目层用新口径，4 周后资产层放开。</li>
+    </ol>
+  </section>
+
+  <section id="s6">
+    <div class="sec-kicker">Causality</div>
+    <h2>因果归因：A/B 对照</h2>
+    <p>衡量「效果」要回答因果问题：命中率提高，是链路带来的，还是大盘自然变好？回答因果需要一个反事实（如果没改，会怎样）。反事实的唯一可靠来源是对照组。</p>
+    <ul>
+      <li><strong>灰度期做 A/B</strong>：同一时间，一部分用户走新链路，一部分走旧路径。链路组显著优于对照组，才能归因给链路。</li>
+      <li><strong>验证通过后全量，不永久保留旧路径</strong>：对照组的使命是「验证链路有效」这一件事，灰度期就能完成。全量后要回答的问题从「有没有效」变成「有没有退化」，这个用护栏指标监控即可，不需要让一部分用户永久承受次优体验。</li>
+    </ul>
+  </section>
+
+  <section id="s7">
+    <div class="sec-kicker">Anti-Gaming</div>
+    <h2>指标防博弈</h2>
+    <p>指标一旦成为目标，就会被针对。三条防扭曲设计：</p>
+    <ol>
+      <li>北极星必须是「选用 + 完成」双条件，防夸大宣传。</li>
+      <li>长尾命中率与头部完成率绑定考核，防无差别压制头部。</li>
+      <li>护栏指标有一票否决权，防为了好看的主指标牺牲体验。</li>
+    </ol>
+    <div class="callout"><b>与 01、02 的关系：</b>北极星「匹配有效率」度量的是 02 号分发链路的效果；稀疏期/稳态期切换对应 01 号「在线观测是哨兵、离线评估定义质量」的分工；A/B 对照的「头部完成率不降」即 02 号马太抑制的「起作用判据」。</div>
+  </section>
+
+  <footer class="footer">
+    <span>《效果指标与口径切换方案》· WorkBuddy 产培实战</span>
+    <span>章鱼（Octopus Way） · octopus4takoyaki@outlook.com · 2026-09</span>
+  </footer>
+</div>
+</body>
+</html>
