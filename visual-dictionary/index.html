@@ -81,7 +81,8 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:v
 
 const $ = s => document.querySelector(s);
 let active = 'all', q = '';
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){s=Array.isArray(s)?s.join('\n'):String(s==null?'':s);return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function render(){
   document.querySelectorAll('section.chapter').forEach(s=>s.remove());
   const host = $('#list');
@@ -99,7 +100,7 @@ function render(){
       return okQ && okP;
     });
     shown += body.length;
-    if(body.length===0) return;
+    if(body.length===0) continue;
     sec.innerHTML =
       `<div class="ch-head">
         <div class="ch-en">Chapter · ${esc(ch.en)}</div>
@@ -111,10 +112,10 @@ function render(){
     host.appendChild(sec);
   }
   // bonus
-  if(active==='all' || active==='完整提示词'){
+  if((active==='all' || active==='完整提示词') && !q){
     const sec=document.createElement('section'); sec.className='chapter'; sec.dataset.ch='完整提示词';
     sec.innerHTML = `<div class="ch-head"><div class="ch-en">Appendix</div><div class="ch-cn">完整网页提示词</div><div class="ch-desc">整站一句话方案：复制整段、替换示例对象即可。上篇为基础版（布局·结构·导航·组件），下篇为体验增强版（含滚动·反馈·风格·高级效果与 Punk 署名说明）。</div></div>
-    <div class="terms bonus">${DATA.bonus.map(b=>`<div class="term"><div><div class="t-no">APPENDIX</div><div class="t-name">${esc(b.title)}</div></div><div class="prompt">${esc(b.prompt)}<button class="copy" data-copy="${esc(b.prompt)}">复制提示词</button></div></div>`).join('')}</div>`;
+    <div class="terms bonus">${DATA.bonus.map(b=>`<div class="term"><div><div class="t-no">APPENDIX</div><div class="t-name">${esc(b.title)}</div></div><div class="prompt">${esc(b.prompt)}<button class="copy" data-copy="${escAttr(b.prompt)}">复制提示词</button></div></div>`).join('')}</div>`;
     host.appendChild(sec); shown += DATA.bonus.length;
   }
   $('#count').textContent = q||active!=='all' ? `匹配 ${shown} 条` : `共 ${total} 个词条`;
@@ -128,7 +129,7 @@ function termHTML(t){
     ${t.suit?`<div class="t-suit"><b>适合：</b>${esc(t.suit)}</div>`:''}
   </div>
   <div><div class="p-label">PROMPT · 复制给 AI 编码工具</div>
-    <div class="prompt">${esc(t.prompt)}<button class="copy" data-copy="${esc(t.prompt)}">复制提示词</button></div>
+    <div class="prompt">${esc(t.prompt)}<button class="copy" data-copy="${escAttr(t.prompt)}">复制提示词</button></div>
   </div></div>`;
 }
 $('#search').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
